@@ -1,0 +1,38 @@
+.todo-category {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    right: 0px;
+    margin: auto 0;
+    height: 180px;
+    overflow-x: hidden;
+    overflow-y: auto;
+    opacity: .4;
+    transition: opacity .3s ease-in-out;
+    ul {
+        padding: 0;
+        li {
+            position: relative;
+            right: -4px;
+            padding: 2px 6px 2px 4px;
+            margin-right: 0;
+            margin-top: 2px;
+            color: #ccc;
+            font-size: 12px;
+            border-radius: 2px 0 0 2px;
+            cursor: pointer;
+            transition: right ease-in-out .3s;
+            &.is-active  {
+                right: 0px;
+                color: #eee;
+                background: rgba(255, 255, 255, .15);
+            }
+            &:hover {
+                background: rgba(255, 255, 255, .3);
+            }
+        }
+    }
+    &:hover {
+        opacity: 1;
+    }
+}

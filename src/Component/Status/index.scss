@@ -1,0 +1,19 @@
+.status {
+    position: absolute;
+    top: 8px;
+    right: 8px;
+    margin: auto;
+    width: 8px;
+    height: 8px;
+    border-radius: 12px;
+    transition: background-color .3s ease-in-out;
+    &.good {
+        background: rgba(0, 255, 0, .4);
+    }
+    &.ok {
+        background: rgba(255, 255, 0, .6);
+    }
+    &.busy {
+        background: rgba(255, 0, 0, .6);
+    }
+}

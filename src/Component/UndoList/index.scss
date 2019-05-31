@@ -1,0 +1,47 @@
+.list {
+    list-style: none;
+    margin: 0;
+    padding-left: 0;
+    transition: background-color .1s ease-in-out, filter .1s ease-in-out;
+    .list-holder {
+        text-align: center;
+        opacity: .5;
+    }
+    .li {
+        position: relative;
+        padding: 4px 8px 4px 32px;
+        margin-right: 12px;
+        border-radius: 4px;
+
+        // 两行
+        text-overflow:ellipsis;
+        display:-webkit-box;
+        /*! autoprefixer: off */
+        -webkit-box-orient:vertical;
+        -webkit-line-clamp:2;
+
+        .checkbox {
+            position: absolute;
+            left: 6px;
+            top: 0;
+            bottom: 0;
+            padding: 0;
+            margin: auto;
+        }
+
+        .close-btn {
+            opacity: 0;
+        }
+
+        &:hover {
+            background: rgba(0, 0, 0, .2);
+            .close-btn {
+                opacity: 1;
+            }
+        }
+    }
+    .message {
+        margin-left: 6px;
+        color: rgba(255, 255, 255, 0.9);
+    }
+} 

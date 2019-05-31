@@ -1,0 +1,42 @@
+.input-wrapper {
+    position: relative;
+    position: absolute;
+    bottom: 16px;
+    left: 0;
+    right: 0;
+    width: 300px;
+    margin: 0 auto;
+    padding: 0 12px;
+    -webkit-app-region: no-drag;
+    input {
+        width: 100%;
+        height: 32px;
+        padding: 4px;
+        border: none;
+        border-bottom: 1px solid rgba(255, 255, 255, 0.8);
+        color: #aaa;
+        font-size: 16px;
+        letter-spacing: 4px;
+        background: transparent;
+        outline: none;
+        opacity: .1;
+        transition: opacity .3s linear;
+    }
+    .close-btn {
+        right: 12px;
+        opacity: 0;
+    }
+    &.focus {
+        input {
+            opacity: .9;
+        }
+        .close-btn {
+            opacity: 1;
+        }
+    }
+    &.empty {
+        .close-btn {
+            opacity: 0;
+        }
+    }
+}

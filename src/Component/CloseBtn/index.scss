@@ -1,0 +1,47 @@
+button.cross {
+    position: absolute;
+    right: 6px;
+    top: 0;
+    bottom: 0;
+    width: 20px;
+    height: 20px;
+    padding: 0;
+    margin: auto;
+    border: none;
+    border-radius: 20px;
+    background: transparent;
+    outline: none;
+    opacity: .3;
+    // background: rgba(255, 255, 255, .1);
+    transition: background-color .3s ease-in-out, opacity .3s ease-in-out;
+    &:hover {
+        opacity: 1;
+        background: rgba(255, 255, 255, .15);
+    }
+    &:before {
+        content: '';
+        position: absolute;
+        display: block;
+        top: 9px;
+        left: 5px;
+        width: 10px;
+        height: 2px;
+        background: rgba(255, 255, 255, 0.8);
+    }
+    &:after {
+        content: '';
+        position: absolute;
+        display: block;
+        top: 5px;
+        left: 9px;
+        width: 2px;
+        height: 10px;
+        background: rgba(255, 255, 255, 0.8);
+    }
+    &.close-btn {
+        transform: rotate(45deg);
+    }
+    &.hidden {
+        opacity: 0;
+    }
+}
