@@ -17,11 +17,11 @@ export default class Input extends PureComponent {
         onBlur: PropTypes.func,
         onChange: PropTypes.func,
         onEnter: PropTypes.func,
-    }
+    };
 
     state = {
         value: '',
-    }
+    };
 
     handleKeydown = (event) => {
         const {onEnter} = this.props;
@@ -32,13 +32,13 @@ export default class Input extends PureComponent {
                 this.handleEmptyInput();
             }
         }
-    }
+    };
 
     handleEmptyInput = () => {
         this.setState({value: ''});
         this.refInput.value = '';
         this.refInput.focus();
-    }
+    };
 
     // 输入框内容发生改变
     handleInputChange = (value) => {
@@ -50,7 +50,7 @@ export default class Input extends PureComponent {
         }
         this.setState({ value });
         onChange && onChange(value);
-    }
+    };
 
     render() {
         const {className, onFocus, onBlur} = this.props;

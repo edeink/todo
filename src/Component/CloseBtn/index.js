@@ -7,11 +7,11 @@ export default class CloseBtn extends PureComponent {
     static propTypes = {
         className: PropTypes.string,
         onClick: PropTypes.func.isRequired,
-    }
+    };
 
     onClick = (event) => {
         this.props.onClick(event);
-    }
+    };
 
     render() {
        const {className} = this.props;

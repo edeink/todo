@@ -12,6 +12,6 @@ const eventHelper = {
         event.initCustomEvent(type, bubbles, cancellable, detail);
         window.dispatchEvent(event);
     }
-}
+};
 
 export default eventHelper;

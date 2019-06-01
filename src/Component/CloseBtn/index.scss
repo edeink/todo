@@ -14,6 +14,7 @@ button.cross {
     opacity: .3;
     // background: rgba(255, 255, 255, .1);
     transition: background-color .3s ease-in-out, opacity .3s ease-in-out;
+    cursor: pointer;
     &:hover {
         opacity: 1;
         background: rgba(255, 255, 255, .15);

@@ -142,6 +142,6 @@ const KEYCODE = {
     COMMA: 190,
     LEFT_PARENTHESIS: 219,
     RIGHT_PARENTHESIS: 221,
-}
+};
 
 export default KEYCODE;

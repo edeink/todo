@@ -9,12 +9,12 @@ export default class Tip extends PureComponent {
 
     static propTypes = {
         duration: PropTypes.number,
-    }
+    };
 
     state = {
         tip: '',
         active: false,
-    }
+    };
 
     componentWillMount() {
         window.addEventListener(eventHelper.TYPE.TIP, this._showTip);
@@ -26,7 +26,7 @@ export default class Tip extends PureComponent {
 
     static showTip = (tip, timeout) => {
         eventHelper.dispatch(eventHelper.TYPE.TIP, {tip, timeout});
-    }
+    };
 
     // 根据输入的内容获得对应的提示
     static getTip(value, message) {

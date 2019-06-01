@@ -8,11 +8,11 @@ export default class Category extends PureComponent {
         activeKey: PropTypes.string.isRequired,
         onChange: PropTypes.func.isRequired,
         options: PropTypes.array.isRequired,
-    }
+    };
 
     onClick = (key) => {
         this.props.onChange(key);
-    }
+    };
 
     render() {
         const {activeKey, options} = this.props;

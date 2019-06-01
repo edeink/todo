@@ -26,12 +26,7 @@ export default class Undo extends PureComponent {
         onSelect: PropTypes.func,
         onDelete: PropTypes.func,
         onDrag: PropTypes.func,
-    }
-
-    onBeforeDragStart = (result) => {
-        const { onDrag } = this.props;
-        return !!onDrag;
-    }
+    };
 
     onDragEnd = (result) => {
         const { list, onDrag } = this.props;
@@ -54,7 +49,7 @@ export default class Undo extends PureComponent {
         }
         list[destinationIndex] = sourceMsg;
         onDrag(list);
-    }
+    };
 
     _renderUndoLi(index, eachList) {
         const { small, checked, onSelect, onDelete, onDrag } = this.props;
@@ -89,7 +84,7 @@ export default class Undo extends PureComponent {
         const { placeholder, className, list } = this.props;
 
         return (
-            <DragDropContext onBeforeDragStart={this.onBeforeDragStart} onDragEnd={this.onDragEnd}>
+            <DragDropContext onDragEnd={this.onDragEnd}>
                 <Droppable droppableId="todo-drop">
                     {
                         (provided, snapshot) => (

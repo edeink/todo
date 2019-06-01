@@ -7,18 +7,19 @@ const STATUS = {
     GOOD: 'good',
     OK: 'ok',
     BUSY: 'busy',
-}
+};
 
 export default class Status extends PureComponent {
     static propTypes = {
-        length: PropTypes.number.isRequired
-    }
+        length: PropTypes.number.isRequired,
+        onClick: PropTypes.func,
+    };
 
     render() {
-        const {length} = this.props;
+        const {length, onClick} = this.props;
         const status = length <= 1 ? STATUS.GOOD : length <= 4 ? STATUS.OK : STATUS.BUSY;
         return (
-            <div className={cs('status', status)}></div>
+            <div className={cs('status', status)} onClick={onClick}/>
         )
     }
 }

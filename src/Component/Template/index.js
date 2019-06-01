@@ -6,11 +6,11 @@ import './index.scss';
 export default class Template extends PureComponent {
     static propTypes = {
     
-    }
+    };
 
     render() {
         return (
-            <div></div>
+            <div/>
         )
     }
 }

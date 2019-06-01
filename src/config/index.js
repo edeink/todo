@@ -7,9 +7,10 @@ const TODO_CONFIG = {
         {key: 'study', value: '学习'},
         {key: 'other', value: '其它'}
     ],
+    CATEGORY_KEY: '__category',
     // 存储的key值
     TODO_KEY: 'todo',
     DONE_KEY: 'done',
-}
+};
 
 export default TODO_CONFIG;
