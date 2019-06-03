@@ -70,6 +70,9 @@ export default class Tip extends PureComponent {
 
     render() {
         const {tip, active} = this.state;
+        if (!tip) {
+            return null;
+        }
         return (
             <div className={cs("tips", { "is-active": active })}>{`${tip}`}</div>
         )

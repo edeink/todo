@@ -211,7 +211,7 @@ class App extends PureComponent {
                         options={category}
                         onChange={this.changeCategory} />
                     {/* 其它提示 */}
-                    <Tip />
+                    <Tip/>
                     {/* 当前状态栏 */}
                     <Status length={message.length} onClick={this.handleToggleTool} />
                     {/* 列表 */}
@@ -253,7 +253,6 @@ class App extends PureComponent {
                         </Uploader>
                     </Tool>
                 }
-                <div></div>
             </div>
         );
     }

@@ -27,15 +27,14 @@
         z-index: -1;
     }
     .app-wrapper {
-        height: 240px;
-        padding: 20px 16px 16px;
-        border-radius: 2px;
+        padding-top: 20px;
         &.open-tool {
             filter: blur(4px);
         }
     }
     .list-container {
-        height: 240px;
+        height: 250px;
+        padding: 0 16px 10px;
         overflow: auto;
         border-radius: 2px;
         -webkit-app-region: no-drag;
