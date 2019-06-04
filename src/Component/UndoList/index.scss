@@ -40,9 +40,18 @@
                 opacity: 1;
             }
         }
+
+        * {
+            display: inline-block;
+            vertical-align: middle;
+        }
     }
     .message {
         margin-left: 6px;
+        margin-bottom: 2px;
         color: rgba(255, 255, 255, 0.9);
+        &.checked {
+            text-decoration: line-through;
+        }
     }
 } 

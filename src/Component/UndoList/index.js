@@ -1,10 +1,19 @@
-import React, { PureComponent } from 'react';
+import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import { DragDropContext, Draggable, Droppable } from 'react-beautiful-dnd';
+import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
 import cs from 'classnames';
 
 import Checkbox from '../Checkbox';
 import CloseBtn from '../CloseBtn';
+import Time from '../Render/Time';
+import Tags from '../Render/Tags';
+import Text from '../Render/Text';
+import HyperLink from '../Render/HyperLink';
+import Emphasize from '../Render/Emphasize';
+import Code from '../Render/Code';
+import Delete from '../Render/Delete';
+
+import parser, {TOKEN_TYPE} from '../../tool/parser';
 
 import './index.scss';
 
@@ -14,10 +23,24 @@ const getItemStyle = (isDragging, draggableStyle) => ({
     background: isDragging && 'rgba(255, 255, 255, 0.2)',
     ...draggableStyle
 });
-const getListStyle = isDraggingOver => ({});
+const getListStyle = (isDraggingOver, refUl) => {
+    if (isDraggingOver === true) {
+        let children = refUl.children;
+        if (children && children.length > 0) {
+            let listHeight = 0;
+            for(let i=0; i<children.length; i++) {
+                listHeight += children[i].clientHeight;
+            }
+            return {
+                height: listHeight
+            }
+        }
+    }
+};
 
-export default class Undo extends PureComponent {
+export default class Undo extends Component {
     static propTypes = {
+        id: PropTypes.string,
         className: PropTypes.string,
         list: PropTypes.array,
         checked: PropTypes.bool,
@@ -29,8 +52,8 @@ export default class Undo extends PureComponent {
     };
 
     onDragEnd = (result) => {
-        const { list, onDrag } = this.props;
-        const { source, destination } = result;
+        const {list, onDrag} = this.props;
+        const {source, destination} = result;
         if (!onDrag || !destination) {
             return;
         }
@@ -50,12 +73,46 @@ export default class Undo extends PureComponent {
         list[destinationIndex] = sourceMsg;
         onDrag(list);
     };
+    
+    _renderLi(eachList) {
+        const {checked} = this.props;
+        let collect = parser.parse(eachList.value);
+        console.log(eachList.value, collect);
+        return (
+            <div className={cs('message', {'checked': checked})}>
+                {
+                    collect.map((eachData) => {
+                        let key = eachData.begin + eachData.content;
+                        switch (eachData.key) {
+                            case TOKEN_TYPE.TIME:
+                                return <Time key={key} data={eachData}/>
+                            case TOKEN_TYPE.Tag:
+                                return <Tags key={key} data={eachData}/>
+                            case TOKEN_TYPE.HYPERLINK:
+                                return <HyperLink key={key} data={eachData}/>
+                            case TOKEN_TYPE.ITALIC:
+                            case TOKEN_TYPE.EM:
+                            case TOKEN_TYPE.EM_ITALIC:
+                                return <Emphasize key={key} data={eachData}/>
+                            case TOKEN_TYPE.CODE:
+                                return <Code key={key} data={eachData}/>
+                            case TOKEN_TYPE.DELETE:
+                                return <Delete key={key} data={eachData}/>
+                            case TOKEN_TYPE.TEXT:
+                            default:
+                                return <Text key={key} data={eachData}/>
+                        }
+                    })
+                }
+            </div>
+        )
+    }
 
     _renderUndoLi(index, eachList) {
-        const { small, checked, onSelect, onDelete, onDrag } = this.props;
+        const {small, checked, onSelect, onDelete, onDrag} = this.props;
         return (
             <Draggable
-                key={index}
+                key={eachList.value + index}
                 index={index}
                 isDragDisabled={!onDrag}
                 draggableId={eachList.value + index}>
@@ -68,12 +125,20 @@ export default class Undo extends PureComponent {
                             snapshot.isDragging,
                             provided.draggableProps.style
                         )}>
+                        
                         <Checkbox
                             small={small}
                             checked={checked}
-                            onChange={(value) => { onSelect(index, value) }} />
-                        <span className="message">{eachList.value}</span>
-                        <CloseBtn onClick={(event) => { onDelete(index, event) }} />
+                            onChange={(value) => {
+                                onSelect(index, value)
+                            }}/>
+                        {
+                            this._renderLi(eachList)
+                        }
+
+                        <CloseBtn onClick={(event) => {
+                            onDelete(index, event)
+                        }}/>
                     </li>
                 )}
             </Draggable>
@@ -81,16 +146,16 @@ export default class Undo extends PureComponent {
     }
 
     render() {
-        const { placeholder, className, list } = this.props;
+        const {id, placeholder, className, list} = this.props;
 
         return (
             <DragDropContext onDragEnd={this.onDragEnd}>
-                <Droppable droppableId="todo-drop">
+                <Droppable droppableId={id}>
                     {
                         (provided, snapshot) => (
                             <ul
-                                ref={provided.innerRef}
-                                style={getListStyle(snapshot.isDraggingOver)}
+                                ref={(comp) => {this.refUl = comp; provided.innerRef(comp)}}
+                                style={getListStyle(snapshot.isDraggingOver, this.refUl)}
                                 className={cs('list', className)}>
                                 {
                                     (!list || list.length === 0) && placeholder &&

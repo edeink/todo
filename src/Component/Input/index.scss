@@ -1,5 +1,4 @@
 .input-wrapper {
-    position: relative;
     position: absolute;
     bottom: 16px;
     left: 0;
@@ -28,7 +27,10 @@
     }
     &.focus {
         input {
+            border-radius: 0;
             opacity: .9;
+            box-shadow: 0 -1px 8px 2px rgba(0, 0, 0, .2);
+            background: rgba(0, 0, 0, .2);
         }
         .close-btn {
             opacity: 1;

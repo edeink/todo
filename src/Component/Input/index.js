@@ -60,6 +60,7 @@ export default class Input extends PureComponent {
             <div className={cs("input-wrapper", className, {'empty': empty})}>
                 <input
                     ref={comp => {this.refInput = comp}}
+                    placeholder={' Enter 确认'}
                     onFocus={onFocus}
                     onBlur={onBlur}
                     onChange={this.handleInputChange}

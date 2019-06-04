@@ -17,7 +17,7 @@ export default class Status extends PureComponent {
 
     render() {
         const {length, onClick} = this.props;
-        const status = length <= 1 ? STATUS.GOOD : length <= 4 ? STATUS.OK : STATUS.BUSY;
+        const status = length <= 2 ? STATUS.GOOD : length <= 5 ? STATUS.OK : STATUS.BUSY;
         return (
             <div className={cs('status', status)} onClick={onClick}/>
         )

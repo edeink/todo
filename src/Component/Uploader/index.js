@@ -22,7 +22,7 @@ export default class Uploader extends PureComponent {
         this.refInput.click();
     }
 
-    handleRead(event) {
+    handleRead = (event) => {
         const {type, onChange} = this.props;
         switch(type) {
             case ACCEPT_TYPE.JSON: {

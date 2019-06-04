@@ -54,38 +54,40 @@ class App extends PureComponent {
         this.doneKey = getStoreKey(categoryKey, TODO_CONIG.DONE_KEY);
     }
     // 从持久化中读取数据
-    _readData = () => {
+    _readData = (callback) => {
         const category = getData(TODO_CONIG.CATEGORY_KEY, TODO_CONIG.CATEGORY);
         const categoryKey = category[0].key;
         this._calcStoreKey(categoryKey);
         this.setState({
             category,
             categoryKey,
+            openTool: false,
         });
-        this._readList();
+        this._readList(callback);
     };
-    _readList = () => {
+    _readList = (callback) => {
         const message = getData(this.storeKey, []);
         const doneMessage = getData(this.doneKey, []);
         this.setState({
             message: [...message],
             doneMessage: [...doneMessage]
+        }, function () {
+            callback && callback();
         })
     };
     /**
      * 对列表进行相关的数据操作 Start
      */
     // 插入列表
-    insertMsg(value) {
+    insertMsg(msg) {
         const { message } = this.state;
-        const tip = Tip.getTip(value, message);
+        const tip = Tip.getTip(msg, message);
         if (tip) {
             Tip.showTip(tip);
             return false;
         }
-        message.unshift({
-            value: value,
-        });
+
+        message.unshift(msg);
         store.setItem(this.storeKey, JSON.stringify(message));
         this.setState({
             message: [...message]
@@ -178,7 +180,9 @@ class App extends PureComponent {
         keys.forEach(function (eachKey) {
             store.setItem(eachKey, JSON.stringify(data[eachKey]));
         });
-        this._readData();
+        this._readData(function () {
+            Tip.showTip('读取成功')
+        });
     };
     // 输入框 focus
     handleInputFocus = () => {
@@ -189,7 +193,9 @@ class App extends PureComponent {
         this.setState({ focus: false });
     };
     handleInputEnter = (value) => {
-        return this.insertMsg(value);
+        return this.insertMsg({
+            value
+        });
     };
     handleToggleTool = () => {
         const { openTool } = this.state;
@@ -215,9 +221,10 @@ class App extends PureComponent {
                     {/* 当前状态栏 */}
                     <Status length={message.length} onClick={this.handleToggleTool} />
                     {/* 列表 */}
-                    <div className="list-container">
+                    <div className={cs('list-container', {'focus': focus})}>
                         <UndoList
-                            className={cs('undo-list', { "focus": focus })}
+                            id='undo'
+                            className={cs('undo-list')}
                             list={message}
                             checked={false}
                             placeholder={"不来一发吗?"}
@@ -229,7 +236,8 @@ class App extends PureComponent {
                             <div className="done-split"/>
                         }
                         <UndoList
-                            className={cs('done-list', { "focus": focus })}
+                            id='done'
+                            className={cs('done-list')}
                             checked small
                             list={doneMessage}
                             onSelect={this.checkMsg}

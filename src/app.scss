@@ -33,7 +33,7 @@
         }
     }
     .list-container {
-        height: 250px;
+        height: 260px;
         padding: 0 16px 10px;
         overflow: auto;
         border-radius: 2px;
@@ -43,7 +43,7 @@
             margin: 16px;
             width: calc(100% - 32px);
             height: 1px;
-            background: rgba(0, 0, 0, 0.4);
+            background: rgba(255, 255, 255, 0.2);
             opacity: .4;
         }
         .todo-list {
@@ -55,6 +55,9 @@
                 opacity: .5;
                 text-decoration: line-through;
             }
+        }
+        &.focus {
+            height: 230px;
         }
     }
 }

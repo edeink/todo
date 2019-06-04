@@ -42,10 +42,7 @@ export default class Tip extends PureComponent {
         if (length === 0) {
             return '哈哈哈，小哑巴！';
         }
-        if (value.length === 1) {
-            return '一个字？太吝啬了吧？';
-        }
-        if (message.length >= 6) {
+        if (message.length >= 9) {
             return '装不下啦，快去干活！';
         }
         if (findIndex !== -1) {
