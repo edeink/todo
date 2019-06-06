@@ -29,7 +29,7 @@ export default class Tip extends PureComponent {
     };
 
     // 根据输入的内容获得对应的提示
-    static getTip(value, message) {
+    static getTip(value, message, isAnti) {
         const length = value.length;
         let findIndex = -1;
         message.some((eachMessage, index) => {
@@ -39,14 +39,22 @@ export default class Tip extends PureComponent {
             }
             return false;
         });
-        if (length === 0) {
-            return '哈哈哈，小哑巴！';
-        }
-        if (message.length >= 9) {
-            return '装不下啦，快去干活！';
+        if (isAnti !== true) {
+            if (length === 0) {
+                return {tip: '哈哈哈，小哑巴！'};
+            }
+            if (message.length >= 9) {
+                return {tip: '装不下啦，快去干活！'};
+            }
         }
         if (findIndex !== -1) {
-            return '你已经说过啦！真啰嗦~';
+            return {
+                index: findIndex,
+                tip: '你已经说过啦！真啰嗦~'
+            }
+        }
+        return {
+            tip: ''
         }
     }
 

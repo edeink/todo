@@ -57,6 +57,11 @@ const pauseSymbol = ['[', ']', '>', '`', '*', '~'];
 const parser = {
     // 将用户输入解析为Todo识别的数据
     parse(txt) {
+        if (typeof txt !== 'string' || txt.length === 0) {
+            console.log('输入的数据有误，请确保输入源为非空字符串');
+            return false;
+        }
+        debugger
         txt = txt.trim();
         let length = txt.length;
         let offset = 0;
@@ -92,6 +97,7 @@ const parser = {
             let textResult = parser.getText(txt, startTextIndex);
             collection.push(textResult);
         }
+        // console.log(`执行解析数据: ${txt}`);
         console.log(`txt: ${txt}, parseData:`, collection);
         return collection;
     },
@@ -131,7 +137,7 @@ const parser = {
         return result;
     },
     getText(txt, offset, nextOffset) {
-        if(nextOffset) {
+        if(typeof nextOffset !== 'undefined') {
             const content = txt.substring(offset, nextOffset + 1);
             return {
                 begin: offset,
@@ -396,7 +402,10 @@ const parser = {
             // 删除线
             // '~~aaa~~ 你好啊',
             // 完整的功能
-            // '>2d 13:20 [A, B] 所有的[格式](www.baidu.com) *能* **否** ***正*** `常` ~~展~~ 示？'
+            // '>2d 13:20 [A, B] 所有的[格式](www.baidu.com) *能* **否** ***正*** `常` ~~展~~ 示？',
+
+            // 其他错误的发现
+            // '0>2d 13:20 [A, B] 所有的[格式](www.baidu.com) *能* **否** ***正*** `常` ~~展~~ 示？0'
         ];
         testData.forEach(function (eachData) {
             parser.parse(eachData);

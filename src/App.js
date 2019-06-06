@@ -10,7 +10,7 @@ import Tool, {ToolBtn} from './Component/Tool';
 import Uploader, {ACCEPT_TYPE} from "./Component/Uploader";
 import ToolTip from './Component/ToolTip';
 
-import TODO_CONIG from './config';
+import TODO_CONFIG from './config';
 import fileHelper from './tool/file';
 import {stringify, parse} from './tool/json';
 
@@ -19,134 +19,172 @@ import './icons.scss';
 import parser from "./tool/parser";
 
 const store = window.localStorage;
-const getStoreKey = function (category, key) {
+
+const ANIMATE = {
+    INSERT_TODO: 'bounceIn',
+    INSERT_DONE: 'slideInDown',
+};
+
+// 从配置中读取信息
+const {
+    CATEGORY_LIST, LIMIT_WORDS,
+    STORE_TODO_KEY, STORE_DONE_KEY, STORE_CATEGORY_KEY,
+    RENDER_EM_KEY, RENDER_PARSE_KEY
+} = TODO_CONFIG;
+const LIST_KEYS = [STORE_TODO_KEY, STORE_DONE_KEY];
+const INIT_CATEGORY_KEY = CATEGORY_LIST[0].key;
+
+// 性能打桩
+const TIME_KEY =  {
+    TEST_PARSER: '【解析数据】解析输入文本耗时：',
+    ALL_DATA_READ_AND_RENDER: '【所有数据】读取 & 渲染耗时：',
+    ALL_LIST_READ_AND_RENDER: '【列表数据】读取 & 渲染耗时：',
+};
+
+const getRealStoreKey = function (category, key) {
     return `__${category}_${key}`;
+};
+
+const getAntiStoreKey = function (storeKey) {
+    return storeKey === STORE_TODO_KEY ? STORE_DONE_KEY : STORE_TODO_KEY;
 };
 
 class App extends PureComponent {
     state = {
-        message: [], // 未完成的消息
-        doneMessage: [], // 已经完成的消息
+        [STORE_TODO_KEY]: [], // 未完成的消息
+        [STORE_DONE_KEY]: [], // 已经完成的消息
         focus: '', // input是否focus
-        category: TODO_CONIG.CATEGORY, // 总分类
-        categoryKey: TODO_CONIG.CATEGORY[0].key, // 当前激活的分类
+        category: CATEGORY_LIST, // 总分类
+        categoryKey: INIT_CATEGORY_KEY, // 当前激活的分类
         openTool: false, // 打开工具栏
         enableAnimate: false, // 禁用动画
+        todoEnterAnimate: '',
     };
-
-    storeKey = '';
-    doneKey = '';
 
     componentDidMount() {
         this._readData(() => {
             this.brieflyCloseAnimate();
         });
+
+        // console.time(TIME_KEY.TEST_PARSER);
+        // const str = '>2d 13:20 [A, B] 所有的[格式](www.baidu.com) *能* **否** ***正*** `常` ~~展~~ 示？';
+        // const testTimes = 100;
+        // for(let i=0; i< testTimes; i++) {
+        //     parser.parse(str);
+        // }
+        // for(let i = 0; i< testTimes; i++) {
+        //     setTimeout(() => {
+        //         return this.insertOneData({
+        //             value: i + str + i
+        //         }, STORE_DONE_KEY, false);
+        //     }, 100 * i);
+        // }
+        // console.timeEnd(TIME_KEY.TEST_PARSER);
     }
 
-    _calcStoreKey(categoryKey) {
-        this.storeKey = getStoreKey(categoryKey, TODO_CONIG.TODO_KEY);
-        this.doneKey = getStoreKey(categoryKey, TODO_CONIG.DONE_KEY);
-    }
     // 从持久化中读取数据
     _readData = (callback) => {
-        const category = parse(store.getItem(TODO_CONIG.CATEGORY_KEY), TODO_CONIG.CATEGORY);
+        console.time(TIME_KEY.ALL_DATA_READ_AND_RENDER);
+        const category = parse(store.getItem(STORE_CATEGORY_KEY), CATEGORY_LIST);
         const categoryKey = category[0].key;
-        this._calcStoreKey(categoryKey);
+        this._readList(callback);
         this.setState({
             category,
             categoryKey,
             openTool: false,
+        }, () => {
+            console.timeEnd(TIME_KEY.ALL_DATA_READ_AND_RENDER);
+            console.timeEnd(TIME_KEY.ALL_LIST_READ_AND_RENDER);
         });
-        this._readList(callback);
     };
+    // 读取每列数据
     _readList = (callback) => {
-        const message = parse(store.getItem(this.storeKey), []);
-        const doneMessage = parse(store.getItem(this.doneKey), []);
-        message.forEach(function (eachMsg) {
-            if (!eachMsg.__parseData) {
-                eachMsg.__parseData = parser.parse(eachMsg.value);
-            }
+        console.time(TIME_KEY.ALL_LIST_READ_AND_RENDER);
+        const {categoryKey} = this.state;
+        LIST_KEYS.forEach((eachKey) => {
+            const storeKey = getRealStoreKey(categoryKey, eachKey);
+            const tempData = parse(store.getItem(storeKey), []);
+            tempData.forEach(function (eachData) {
+                if (!eachData[RENDER_PARSE_KEY]) {
+                    eachData[RENDER_PARSE_KEY] = parser.parse(eachData.value);
+                }
+            });
+            this.setState({
+                [eachKey]: tempData
+            });
         });
-        doneMessage.forEach(function (eachMsg) {
-            if (!eachMsg.__parseData) {
-                eachMsg.__parseData = parser.parse(eachMsg.value);
-            }
-        });
-        this.setState({
-            message: [...message],
-            doneMessage: [...doneMessage]
-        }, function () {
-            callback && callback();
-        })
+        callback && callback();
     };
+
     /**
      * 对列表进行相关的数据操作 Start
      */
-    // 插入列表
-    insertMsg(msg) {
-        const { message } = this.state;
-        const newMessage = [...message];
-        const tip = Tip.getTip(msg, message);
+    insertOneData = (data, storeKey, isEnter) => {
+        const {categoryKey} = this.state;
+        const preData = this.state[storeKey];
+        const {tip, index} = Tip.getTip(data.value, preData, !isEnter);
         if (tip) {
             Tip.showTip(tip);
+            if (index >= 0) {
+                this.shakeData(index, storeKey);
+            }
             return false;
         }
-        msg.__parseData = parser.parse(msg.value);
-        newMessage.unshift(msg);
-        store.setItem(this.storeKey, stringify(newMessage));
+        if (isEnter === true) {
+            const antiStoreKey = getAntiStoreKey(storeKey);
+            const antiData = this.state[antiStoreKey];
+            const {tip: antiTip, index} = Tip.getTip(data.value, antiData, true);
+            if (antiTip) {
+                Tip.showTip(antiTip);
+                if (index >=0) {
+                    this.shakeData(index, antiStoreKey);
+                }
+                return false;
+            }
+        }
+        const newData = [...preData];
+        if (!data[RENDER_PARSE_KEY]) {
+            data[RENDER_PARSE_KEY] = parser.parse(data.value);
+        }
+        newData.unshift(data);
+        const realStoreKey = getRealStoreKey(categoryKey, storeKey);
+        store.setItem(realStoreKey, stringify(newData));
         this.setState({
-            message: newMessage
+            [storeKey]: newData,
         });
         return true;
-    }
-    dragMsg = (message) => {
-        let newMessage = [...message];
-        this.setState({
-            message: newMessage
-        });
-        store.setItem(this.storeKey, stringify(newMessage));
     };
     // 完成或未完成列表
-    checkMsg = (index, value) => {
-        const { message, doneMessage } = this.state;
-        let newMessage = [...message];
-        let newDoneMessage = [...doneMessage];
-        if (value === true) {
-            newMessage[index].date = Date.now();
-            newDoneMessage.unshift(newMessage[index]);
-            newMessage.splice(index, 1);
-        } else {
-            newDoneMessage[index].date = null;
-            newMessage.unshift(newDoneMessage[index]);
-            newDoneMessage.splice(index, 1);
+    toggleOneData = (index, value, storeKey) => {
+        const preData = this.state[storeKey];
+        const antiKey = getAntiStoreKey(storeKey);
+        const deleteOneData = preData[index];
+        if(this.insertOneData(deleteOneData, antiKey)) {
+            this.deleteOneData(index, storeKey, true);
         }
-        this.setState({
-            message: newMessage,
-            doneMessage: newDoneMessage
-        });
-        store.setItem(this.storeKey, stringify(newMessage));
-        store.setItem(this.doneKey, stringify(newDoneMessage));
     };
     // 删除列表
-    deleteMsg = (index, event) => {
-        const { message } = this.state;
-        let newMessage = [...message];
-        newMessage.splice(index, 1);
-        store.setItem(this.storeKey, stringify(newMessage));
-        this.brieflyCloseAnimate();
+    deleteOneData = (index, storeKey, enableAnimate) => {
+        const {categoryKey} = this.state;
+        const preData = this.state[storeKey];
+        const newData = [...preData];
+        newData.splice(index, 1);
+        const realStoreKey = getRealStoreKey(categoryKey, storeKey);
+        store.setItem(realStoreKey, stringify(newData));
+        if (enableAnimate !== true) {
+            this.brieflyCloseAnimate();
+        }
         this.setState({
-            message: newMessage
+            [storeKey]: newData
         });
     };
-    // 删除已完成列表
-    deleteDoneMsg = (index, event) => {
-        let { doneMessage } = this.state;
-        let newMessage = [...doneMessage];
-        newMessage.splice(index, 1);
-        store.setItem(this.storeKey, stringify(newMessage));
+    dragData = (listData, storeKey) => {
+        const {categoryKey} = this.state;
         this.setState({
-            doneMessage: newMessage
+            [storeKey]: [...listData]
         });
+        const realStoreKey = getRealStoreKey(categoryKey, storeKey);
+        store.setItem(realStoreKey, stringify(listData));
     };
     /**
      * 对列表进行相关的数据操作 END
@@ -155,6 +193,19 @@ class App extends PureComponent {
     /**
      * 前端交互事件 START
      */
+    // 摇动一个数据以引起别人注意
+    shakeData = (index, storeKey) => {
+        const preData = this.state[storeKey];
+        preData[index][RENDER_EM_KEY] = true;
+        this.setState({
+            [storeKey]: [...preData]
+        }, () => {
+            preData[index][RENDER_EM_KEY] = false;
+            this.setState({
+                [storeKey]: [...preData]
+            })
+        });
+    };
     // 短暂关闭动画
     brieflyCloseAnimate = () => {
         this.setState({
@@ -170,7 +221,6 @@ class App extends PureComponent {
         this.setState({
             categoryKey: key,
         }, () => {
-            this._calcStoreKey(key);
             this._readList();
             this.brieflyCloseAnimate();
         });
@@ -182,19 +232,17 @@ class App extends PureComponent {
         saveObj.data = {};
         category.forEach((eachCategory) => {
             const { key } = eachCategory;
-            const tempTodoKey = getStoreKey(key, TODO_CONIG.TODO_KEY);
-            const tempDoneKey = getStoreKey(key, TODO_CONIG.DONE_KEY);
-            const message = parse(store.getItem(tempTodoKey), []);
-            const doneMessage = parse(store.getItem(tempDoneKey), []);
-            saveObj.data[tempTodoKey] = message;
-            saveObj.data[tempDoneKey] = doneMessage;
+            LIST_KEYS.forEach(function (eachKey) {
+                const tempStoreKey = getRealStoreKey(key, eachKey);
+                saveObj.data[tempStoreKey] = parse(store.getItem(tempStoreKey), []);
+            });
         });
-        fileHelper.save('config.json', stringify(saveObj));
+        fileHelper.save('config.json', JSON.stringify(saveObj));
     };
     handleRead = (readObj) => {
         const category = readObj.category;
         const data = readObj.data;
-        store.setItem(TODO_CONIG.CATEGORY_KEY, stringify(category));
+        store.setItem(STORE_CATEGORY_KEY, JSON.stringify(category));
         let keys = Object.keys(data);
         keys.forEach(function (eachKey) {
             store.setItem(eachKey, stringify(data[eachKey]));
@@ -203,18 +251,16 @@ class App extends PureComponent {
             Tip.showTip('读取成功')
         });
     };
-    // 输入框 focus
     handleInputFocus = () => {
         this.setState({ focus: true });
     };
-    // 输入框 blur
     handleInputBlur = () => {
         this.setState({ focus: false });
     };
     handleInputEnter = (value) => {
-        return this.insertMsg({
+        return this.insertOneData({
             value
-        });
+        }, STORE_TODO_KEY, true);
     };
     handleToggleTool = () => {
         const { openTool } = this.state;
@@ -225,8 +271,11 @@ class App extends PureComponent {
     /**
      * 前端交互事件 END
      */
+
     render() {
-        const { message, doneMessage, focus, category, categoryKey, openTool, enableAnimate } = this.state;
+        const { focus, category, categoryKey, openTool, enableAnimate, todoEnterAnimate } = this.state;
+        const todoData = this.state[STORE_TODO_KEY];
+        const doneData = this.state[STORE_DONE_KEY];
         return (
             <div id="todo-app" tabIndex="0">
                 <div className={cs('app-wrapper', {'open-tool': openTool})}>
@@ -238,40 +287,43 @@ class App extends PureComponent {
                     {/* 其它提示 */}
                     <Tip/>
                     {/* 当前状态栏 */}
-                    <Status length={message.length} onClick={this.handleToggleTool} isActive={openTool}/>
+                    <Status length={todoData.length} onClick={this.handleToggleTool} isActive={openTool}/>
                     {/* 列表 */}
                     <div className={cs('list-container', {'focus': focus})}>
                         <UndoList
                             id='undo'
+                            storeKey={STORE_TODO_KEY}
                             className={cs('undo-list')}
-                            list={message}
+                            list={todoData}
                             checked={false}
                             placeholder={"不来一发吗?"}
+                            enterActive={todoEnterAnimate}
                             transitionEnter={enableAnimate}
-                            transitionLeave={enableAnimate}
-                            onSelect={this.checkMsg}
-                            onDelete={this.deleteMsg}
-                            onDrag={this.dragMsg} />
+                            transitionLeave={false}
+                            onSelect={this.toggleOneData}
+                            onDelete={this.deleteOneData}
+                            onDrag={this.dragData} />
                         {
-                            doneMessage.length > 0 &&
+                            doneData.length > 0 &&
                             <div className="done-split"/>
                         }
                         <UndoList
                             id='done'
+                            storeKey={STORE_DONE_KEY}
                             className={cs('done-list')}
                             checked small
-                            list={doneMessage}
-                            enterActive={'bounceInLeft'}
+                            list={doneData}
+                            enterActive={ANIMATE.INSERT_DONE}
                             transitionEnter={enableAnimate}
                             transitionLeave={false}
-                            onSelect={this.checkMsg}
-                            onDelete={this.deleteDoneMsg} />
+                            onSelect={this.toggleOneData}
+                            onDelete={this.deleteOneData} />
                     </div>
 
                     {/* 输入框 */}
                     <Input
                         className={cs({ "focus": focus })}
-                        max={TODO_CONIG.LIMIT_WORDS}
+                        max={LIMIT_WORDS}
                         onFocus={this.handleInputFocus}
                         onBlur={this.handleInputBlur}
                         onEnter={this.handleInputEnter} />

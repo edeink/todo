@@ -1,16 +1,19 @@
 const TODO_CONFIG = {
     LIMIT_WORDS: 24, // 允许输入的字
     // 默认分类
-    CATEGORY : [
+    CATEGORY_LIST : [
         {key: 'work', value: '工作'},
         {key: 'home', value: '家庭'},
         {key: 'study', value: '学习'},
         {key: 'other', value: '其它'}
     ],
-    CATEGORY_KEY: '__category',
-    // 存储的key值
-    TODO_KEY: 'todo',
-    DONE_KEY: 'done',
+    // 存储层次的key
+    STORE_CATEGORY_KEY: '__category',
+    STORE_TODO_KEY: '__todoList',
+    STORE_DONE_KEY: '__doneList',
+    // 显示层次的key
+    RENDER_PARSE_KEY: '__parseData',
+    RENDER_EM_KEY: '__em',
 };
 
 export default TODO_CONFIG;

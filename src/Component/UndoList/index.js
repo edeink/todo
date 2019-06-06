@@ -32,6 +32,7 @@ export default class UndoList extends Component {
     static propTypes = {
         id: PropTypes.string,
         className: PropTypes.string,
+        storeKey: PropTypes.string.isRequired,
         list: PropTypes.array,
         checked: PropTypes.bool,
         small: PropTypes.bool,
@@ -46,7 +47,7 @@ export default class UndoList extends Component {
     };
 
     onDragEnd = (result) => {
-        const {list, onDrag} = this.props;
+        const {list, storeKey, onDrag} = this.props;
         const newList = [...list];
         const {source, destination} = result;
         if (!onDrag || !destination) {
@@ -66,7 +67,7 @@ export default class UndoList extends Component {
             }
         }
         newList[destinationIndex] = sourceMsg;
-        onDrag(newList);
+        onDrag(newList, storeKey);
     };
 
     shouldComponentUpdate(nextProps) {
@@ -114,7 +115,7 @@ export default class UndoList extends Component {
     }
 
     _renderUndoLi(index, eachList) {
-        const {small, checked, onSelect, onDelete, onDrag} = this.props;
+        const {small, checked, storeKey, onSelect, onDelete, onDrag} = this.props;
         return (
             <Draggable
                 key={eachList.value}
@@ -136,14 +137,14 @@ export default class UndoList extends Component {
                             small={small}
                             checked={checked}
                             onChange={(value) => {
-                                onSelect(index, value)
+                                onSelect(index, value, storeKey)
                             }}/>
                         {
                             this._renderLi(eachList, snapshot.isDragging,)
                         }
 
                         <CloseBtn onClick={(event) => {
-                            onDelete(index, event)
+                            onDelete(index, storeKey, event)
                         }}/>
                     </li>
                 )}
@@ -178,8 +179,8 @@ export default class UndoList extends Component {
                                     }}
                                     transitionEnter={transitionEnter && true}
                                     transitionLeave={transitionLeave && true}
-                                    transitionEnterTimeout={500}
-                                    transitionLeaveTimeout={300}>
+                                    transitionEnterTimeout={300}
+                                    transitionLeaveTimeout={200}>
                                     {
                                         list.map((eachList, index) => {
                                             return this._renderUndoLi(index, eachList, provided.placeholder)
