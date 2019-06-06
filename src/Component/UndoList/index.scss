@@ -10,16 +10,9 @@
     }
     .li {
         position: relative;
-        padding: 4px 8px 4px 32px;
+        padding: 4px 4px 4px 32px;
         margin-right: 12px;
         border-radius: 4px;
-
-        // 两行
-        text-overflow:ellipsis;
-        display:-webkit-box;
-        /*! autoprefixer: off */
-        -webkit-box-orient:vertical;
-        -webkit-line-clamp:2;
 
         .checkbox {
             position: absolute;
@@ -40,18 +33,13 @@
                 opacity: 1;
             }
         }
-
-        * {
-            display: inline-block;
-            vertical-align: middle;
-        }
     }
     .message {
         margin-left: 6px;
-        margin-bottom: 2px;
+        padding-right: 16px;
         color: rgba(255, 255, 255, 0.9);
         &.checked {
             text-decoration: line-through;
         }
     }
-} 
+}

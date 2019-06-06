@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import cs from 'classnames';
+// import cs from 'classnames';
 import './index.scss';
 
 export default class Code extends PureComponent {
@@ -11,7 +11,7 @@ export default class Code extends PureComponent {
     render() {
         const {data} = this.props.data;
         return (
-            <div className='code'>{data}</div>
+            <pre className='code'>{data}</pre>
         )
     }
 }

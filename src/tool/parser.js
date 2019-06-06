@@ -332,30 +332,44 @@ const parser = {
         txt = txt.substr(offset);
         let firIndex = txt.indexOf(' ');
         let secIndex = txt.indexOf(' ', firIndex + 1);
-        let delayTime = txt.substring(offset + 1, firIndex); // 推迟的时间
-        let configTime = txt.substring(firIndex + 1, secIndex); // 选中的时间
-        if (secIndex === -1) {
-            return null;
-        }
-        return {
-            begin: 0 + offset,
-            end: secIndex + offset,
-            content: txt.substring(0, secIndex),
-            key: TOKEN_TYPE.TIME,
-            data: {
-                delayTime,
-                configTime
+        let delay = txt.substring(offset + 1, firIndex); // 推迟的时间
+
+        if (secIndex !== -1) {
+            let clock = txt.substring(firIndex + 1, secIndex); // 选中的时间
+            return {
+                begin: offset,
+                end: secIndex + offset,
+                content: txt.substring(0, secIndex),
+                key: TOKEN_TYPE.TIME,
+                data: {
+                    delay,
+                    clock
+                }
+            }
+        } else {
+            // 处理只有>，后面无命令的情况
+            if(txt[1] === ' ') {
+                return;
+            }
+            return {
+                begin: offset,
+                end: firIndex + offset,
+                content: txt.substring(0, firIndex),
+                key: TOKEN_TYPE.TIME,
+                data: {
+                    delay,
+                }
             }
         }
+
     },
     test() {
         const testData = [
-            // // 完整
-            // '>2d 15:13 [tag1, tag2] 时间 & 分类的输入',
             // // 时间
+            // '>1s 推迟一秒',
             // '> 15:30 没有推迟时间的时间输入',
             // '> 错误的时间输入',
-            // '>ew 15:20 ', // 该文本会被解析成文本
+            // '>ew 15:20 ', // ew会被解析成时间，15:20会被解析成文本
             // '>ew 15:20 后面有字',
             // '巴拉巴拉 >2d 24:30 时间解析不解析', // 应该解析
             // '>2d 13 半个时间',
@@ -381,6 +395,7 @@ const parser = {
             // '****fa***', // 应该被解析成Italic & em
             // 删除线
             // '~~aaa~~ 你好啊',
+            // 完整的功能
             // '>2d 13:20 [A, B] 所有的[格式](www.baidu.com) *能* **否** ***正*** `常` ~~展~~ 示？'
         ];
         testData.forEach(function (eachData) {
@@ -389,6 +404,6 @@ const parser = {
     }
 };
 
-// parser.test();
+parser.test();
 
 export default parser;

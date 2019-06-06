@@ -1,6 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
+import {CSSTransitionGroup} from 'react-transition-group'
 import cs from 'classnames';
 
 import Checkbox from '../Checkbox';
@@ -13,7 +14,8 @@ import Emphasize from '../Render/Emphasize';
 import Code from '../Render/Code';
 import Delete from '../Render/Delete';
 
-import parser, {TOKEN_TYPE} from '../../tool/parser';
+import {TOKEN_TYPE} from '../../tool/parser';
+import {stringify} from "../../tool/json";
 
 import './index.scss';
 
@@ -24,21 +26,9 @@ const getItemStyle = (isDragging, draggableStyle) => ({
     ...draggableStyle
 });
 const getListStyle = (isDraggingOver, refUl) => {
-    if (isDraggingOver === true) {
-        let children = refUl.children;
-        if (children && children.length > 0) {
-            let listHeight = 0;
-            for(let i=0; i<children.length; i++) {
-                listHeight += children[i].clientHeight;
-            }
-            return {
-                height: listHeight
-            }
-        }
-    }
 };
 
-export default class Undo extends Component {
+export default class UndoList extends Component {
     static propTypes = {
         id: PropTypes.string,
         className: PropTypes.string,
@@ -46,6 +36,10 @@ export default class Undo extends Component {
         checked: PropTypes.bool,
         small: PropTypes.bool,
         placeholder: PropTypes.string,
+        enterActive: PropTypes.string,
+        leaveActive: PropTypes.string,
+        transitionEnter: PropTypes.bool,
+        transitionLeave: PropTypes.bool,
         onSelect: PropTypes.func,
         onDelete: PropTypes.func,
         onDrag: PropTypes.func,
@@ -53,33 +47,44 @@ export default class Undo extends Component {
 
     onDragEnd = (result) => {
         const {list, onDrag} = this.props;
+        const newList = [...list];
         const {source, destination} = result;
         if (!onDrag || !destination) {
             return;
         }
         const sourceIndex = source.index;
         const destinationIndex = destination.index;
-        const sourceMsg = list[sourceIndex];
+        const sourceMsg = newList[sourceIndex];
         // 根据拖拽结果调整数据顺序
         if (sourceIndex < destinationIndex) {
             for (let i = sourceIndex; i < destinationIndex; i++) {
-                list[i] = list[i + 1];
+                newList[i] = newList[i + 1];
             }
         } else if (sourceIndex > destinationIndex) {
             for (let i = sourceIndex; i > destinationIndex; i--) {
-                list[i] = list[i - 1];
+                newList[i] = newList[i - 1];
             }
         }
-        list[destinationIndex] = sourceMsg;
-        onDrag(list);
+        newList[destinationIndex] = sourceMsg;
+        onDrag(newList);
     };
-    
-    _renderLi(eachList) {
-        const {checked} = this.props;
-        let collect = parser.parse(eachList.value);
-        console.log(eachList.value, collect);
+
+    shouldComponentUpdate(nextProps) {
+        const {list} = this.props;
+        if (list.length !== nextProps.list.length) {
+            return true;
+        }
+        if (stringify(list) !== stringify(nextProps.list)) {
+            return true;
+        }
+        return false;
+    }
+
+    _renderLi(eachList, isDragging) {
+        // const {checked} = this.props;
+        let collect = eachList.__parseData;
         return (
-            <div className={cs('message', {'checked': checked})}>
+            <div className='message'>
                 {
                     collect.map((eachData) => {
                         let key = eachData.begin + eachData.content;
@@ -112,20 +117,21 @@ export default class Undo extends Component {
         const {small, checked, onSelect, onDelete, onDrag} = this.props;
         return (
             <Draggable
-                key={eachList.value + index}
+                key={eachList.value}
                 index={index}
                 isDragDisabled={!onDrag}
                 draggableId={eachList.value + index}>
                 {(provided, snapshot) => (
+
                     <li ref={provided.innerRef}
-                        className="li"
+                        className={cs("li", {"checked": checked})}
                         {...provided.draggableProps}
                         {...provided.dragHandleProps}
                         style={getItemStyle(
                             snapshot.isDragging,
                             provided.draggableProps.style
                         )}>
-                        
+
                         <Checkbox
                             small={small}
                             checked={checked}
@@ -133,7 +139,7 @@ export default class Undo extends Component {
                                 onSelect(index, value)
                             }}/>
                         {
-                            this._renderLi(eachList)
+                            this._renderLi(eachList, snapshot.isDragging,)
                         }
 
                         <CloseBtn onClick={(event) => {
@@ -146,7 +152,8 @@ export default class Undo extends Component {
     }
 
     render() {
-        const {id, placeholder, className, list} = this.props;
+        let {id, placeholder, className, list,
+            enterActive, leaveActive, transitionEnter, transitionLeave} = this.props;
 
         return (
             <DragDropContext onDragEnd={this.onDragEnd}>
@@ -154,18 +161,33 @@ export default class Undo extends Component {
                     {
                         (provided, snapshot) => (
                             <ul
-                                ref={(comp) => {this.refUl = comp; provided.innerRef(comp)}}
-                                style={getListStyle(snapshot.isDraggingOver, this.refUl)}
+                                ref={provided.innerRef}
+                                style={getListStyle(snapshot.isDraggingOver)}
                                 className={cs('list', className)}>
                                 {
                                     (!list || list.length === 0) && placeholder &&
-                                    <div className="list-holder">{placeholder}</div>
+                                    <div key="place-older"
+                                         className="list-holder">{placeholder}</div>
                                 }
-                                {
-                                    list.map((eachList, index) => {
-                                        return this._renderUndoLi(index, eachList);
-                                    })
-                                }
+                                <CSSTransitionGroup
+                                    transitionName={{
+                                        enter: "animated",
+                                        enterActive: enterActive || "bounceIn",
+                                        leave: "animated",
+                                        leaveActive: leaveActive || "fadeOutRight"
+                                    }}
+                                    transitionEnter={transitionEnter && true}
+                                    transitionLeave={transitionLeave && true}
+                                    transitionEnterTimeout={500}
+                                    transitionLeaveTimeout={300}>
+                                    {
+                                        list.map((eachList, index) => {
+                                            return this._renderUndoLi(index, eachList, provided.placeholder)
+
+                                        })
+                                    }
+                                </CSSTransitionGroup>
+                                {provided.placeholder}
                             </ul>
                         )
                     }

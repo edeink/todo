@@ -4,17 +4,25 @@
     left: 0;
     width: 310px;
     height: 300px;
-    padding: 12px;
-    background: rgba(0, 0, 0, .4);
+    padding: 16px;
+    //background: rgba(0, 0, 0, .4);
     border-radius: 8px;
     font-size: 0;
+    opacity: 0;
+    transition: opacity .1s ease-in-out;
+    z-index: -1;
+    &.is-active {
+        opacity: 1;
+        z-index: 1;
+        transition: opacity .1s ease-in-out .2s;
+    }
     .tool-btn {
         display: inline-block;
         width: 32px;
         height: 32px;
-        margin: 4px;
         line-height: 32px;
         text-align: center;
+        margin-right: 4px;
         border-radius: 2px;
         cursor: pointer;
         transition: background-color .3s ease-in-out;
@@ -29,8 +37,8 @@
         }
     }
     .close-btn {
-        top: 6px;
-        right: 6px;
+        top: 7px;
+        right: 8px;
         bottom: auto;
     }
 }

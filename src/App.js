@@ -8,28 +8,19 @@ import Input from './Component/Input';
 import UndoList from './Component/UndoList';
 import Tool, {ToolBtn} from './Component/Tool';
 import Uploader, {ACCEPT_TYPE} from "./Component/Uploader";
+import ToolTip from './Component/ToolTip';
 
 import TODO_CONIG from './config';
 import fileHelper from './tool/file';
+import {stringify, parse} from './tool/json';
 
 import './app.scss';
 import './icons.scss';
+import parser from "./tool/parser";
 
 const store = window.localStorage;
 const getStoreKey = function (category, key) {
     return `__${category}_${key}`;
-};
-const getData = function(key, defaultValue) {
-    let data = null;
-    try {
-        data = JSON.parse(store.getItem(key));
-    } catch (err) {
-
-    }
-    if (!data) {
-        data = defaultValue;
-    }
-    return data;
 };
 
 class App extends PureComponent {
@@ -40,13 +31,16 @@ class App extends PureComponent {
         category: TODO_CONIG.CATEGORY, // 总分类
         categoryKey: TODO_CONIG.CATEGORY[0].key, // 当前激活的分类
         openTool: false, // 打开工具栏
+        enableAnimate: false, // 禁用动画
     };
 
     storeKey = '';
     doneKey = '';
 
     componentDidMount() {
-        this._readData();
+        this._readData(() => {
+            this.brieflyCloseAnimate();
+        });
     }
 
     _calcStoreKey(categoryKey) {
@@ -55,7 +49,7 @@ class App extends PureComponent {
     }
     // 从持久化中读取数据
     _readData = (callback) => {
-        const category = getData(TODO_CONIG.CATEGORY_KEY, TODO_CONIG.CATEGORY);
+        const category = parse(store.getItem(TODO_CONIG.CATEGORY_KEY), TODO_CONIG.CATEGORY);
         const categoryKey = category[0].key;
         this._calcStoreKey(categoryKey);
         this.setState({
@@ -66,8 +60,18 @@ class App extends PureComponent {
         this._readList(callback);
     };
     _readList = (callback) => {
-        const message = getData(this.storeKey, []);
-        const doneMessage = getData(this.doneKey, []);
+        const message = parse(store.getItem(this.storeKey), []);
+        const doneMessage = parse(store.getItem(this.doneKey), []);
+        message.forEach(function (eachMsg) {
+            if (!eachMsg.__parseData) {
+                eachMsg.__parseData = parser.parse(eachMsg.value);
+            }
+        });
+        doneMessage.forEach(function (eachMsg) {
+            if (!eachMsg.__parseData) {
+                eachMsg.__parseData = parser.parse(eachMsg.value);
+            }
+        });
         this.setState({
             message: [...message],
             doneMessage: [...doneMessage]
@@ -81,65 +85,68 @@ class App extends PureComponent {
     // 插入列表
     insertMsg(msg) {
         const { message } = this.state;
+        const newMessage = [...message];
         const tip = Tip.getTip(msg, message);
         if (tip) {
             Tip.showTip(tip);
             return false;
         }
-
-        message.unshift(msg);
-        store.setItem(this.storeKey, JSON.stringify(message));
+        msg.__parseData = parser.parse(msg.value);
+        newMessage.unshift(msg);
+        store.setItem(this.storeKey, stringify(newMessage));
         this.setState({
-            message: [...message]
+            message: newMessage
         });
         return true;
     }
     dragMsg = (message) => {
+        let newMessage = [...message];
         this.setState({
-            message: [...message]
+            message: newMessage
         });
-        store.setItem(this.storeKey, JSON.stringify(message));
+        store.setItem(this.storeKey, stringify(newMessage));
     };
     // 完成或未完成列表
     checkMsg = (index, value) => {
         const { message, doneMessage } = this.state;
+        let newMessage = [...message];
+        let newDoneMessage = [...doneMessage];
         if (value === true) {
-            message[index].date = Date.now();
-            doneMessage.unshift(message[index]);
-            message.splice(index, 1);
+            newMessage[index].date = Date.now();
+            newDoneMessage.unshift(newMessage[index]);
+            newMessage.splice(index, 1);
         } else {
-            doneMessage[index].date = null;
-            message.unshift(doneMessage[index]);
-            doneMessage.splice(index, 1);
+            newDoneMessage[index].date = null;
+            newMessage.unshift(newDoneMessage[index]);
+            newDoneMessage.splice(index, 1);
         }
         this.setState({
-            message: [...message],
-            doneMessage: [...doneMessage],
+            message: newMessage,
+            doneMessage: newDoneMessage
         });
-        store.setItem(this.storeKey, JSON.stringify(message));
-        store.setItem(this.doneKey, JSON.stringify(doneMessage));
+        store.setItem(this.storeKey, stringify(newMessage));
+        store.setItem(this.doneKey, stringify(newDoneMessage));
     };
     // 删除列表
     deleteMsg = (index, event) => {
-        let { message } = this.state;
-        message.splice(index, 1);
-        store.setItem(this.storeKey, JSON.stringify(message));
+        const { message } = this.state;
+        let newMessage = [...message];
+        newMessage.splice(index, 1);
+        store.setItem(this.storeKey, stringify(newMessage));
+        this.brieflyCloseAnimate();
         this.setState({
-            message: [...message]
+            message: newMessage
         });
-        event.stopPropagation();
-        event.preventDefault();
     };
     // 删除已完成列表
     deleteDoneMsg = (index, event) => {
         let { doneMessage } = this.state;
-        doneMessage.splice(index, 1);
-        store.setItem(this.storeKey, JSON.stringify(doneMessage));
+        let newMessage = [...doneMessage];
+        newMessage.splice(index, 1);
+        store.setItem(this.storeKey, stringify(newMessage));
         this.setState({
-            doneMessage: [...doneMessage]
+            doneMessage: newMessage
         });
-        event.stopPropagation();
-        event.preventDefault();
     };
     /**
      * 对列表进行相关的数据操作 END
@@ -148,12 +155,24 @@ class App extends PureComponent {
     /**
      * 前端交互事件 START
      */
+    // 短暂关闭动画
+    brieflyCloseAnimate = () => {
+        this.setState({
+            enableAnimate: false,
+        });
+        setTimeout(() => {
+            this.setState({
+                enableAnimate: true,
+            })
+        }, 100);
+    };
     changeCategory = (key) => {
         this.setState({
-            categoryKey: key
+            categoryKey: key,
         }, () => {
             this._calcStoreKey(key);
             this._readList();
+            this.brieflyCloseAnimate();
         });
     };
     handleSave = () => {
@@ -165,20 +184,20 @@ class App extends PureComponent {
             const { key } = eachCategory;
             const tempTodoKey = getStoreKey(key, TODO_CONIG.TODO_KEY);
             const tempDoneKey = getStoreKey(key, TODO_CONIG.DONE_KEY);
-            const message = getData(tempTodoKey, []);
-            const doneMessage = getData(tempDoneKey, []);
+            const message = parse(store.getItem(tempTodoKey), []);
+            const doneMessage = parse(store.getItem(tempDoneKey), []);
             saveObj.data[tempTodoKey] = message;
             saveObj.data[tempDoneKey] = doneMessage;
         });
-        fileHelper.save('config.json', JSON.stringify(saveObj));
+        fileHelper.save('config.json', stringify(saveObj));
     };
     handleRead = (readObj) => {
         const category = readObj.category;
         const data = readObj.data;
-        store.setItem(TODO_CONIG.CATEGORY_KEY, JSON.stringify(category));
+        store.setItem(TODO_CONIG.CATEGORY_KEY, stringify(category));
         let keys = Object.keys(data);
         keys.forEach(function (eachKey) {
-            store.setItem(eachKey, JSON.stringify(data[eachKey]));
+            store.setItem(eachKey, stringify(data[eachKey]));
         });
         this._readData(function () {
             Tip.showTip('读取成功')
@@ -207,9 +226,9 @@ class App extends PureComponent {
      * 前端交互事件 END
      */
     render() {
-        const { message, doneMessage, focus, category, categoryKey, openTool } = this.state;
+        const { message, doneMessage, focus, category, categoryKey, openTool, enableAnimate } = this.state;
         return (
-            <div className="todo-app" tabIndex="0">
+            <div id="todo-app" tabIndex="0">
                 <div className={cs('app-wrapper', {'open-tool': openTool})}>
 
                     {/* 分类 */}
@@ -219,7 +238,7 @@ class App extends PureComponent {
                     {/* 其它提示 */}
                     <Tip/>
                     {/* 当前状态栏 */}
-                    <Status length={message.length} onClick={this.handleToggleTool} />
+                    <Status length={message.length} onClick={this.handleToggleTool} isActive={openTool}/>
                     {/* 列表 */}
                     <div className={cs('list-container', {'focus': focus})}>
                         <UndoList
@@ -228,6 +247,8 @@ class App extends PureComponent {
                             list={message}
                             checked={false}
                             placeholder={"不来一发吗?"}
+                            transitionEnter={enableAnimate}
+                            transitionLeave={enableAnimate}
                             onSelect={this.checkMsg}
                             onDelete={this.deleteMsg}
                             onDrag={this.dragMsg} />
@@ -240,6 +261,9 @@ class App extends PureComponent {
                             className={cs('done-list')}
                             checked small
                             list={doneMessage}
+                            enterActive={'bounceInLeft'}
+                            transitionEnter={enableAnimate}
+                            transitionLeave={false}
                             onSelect={this.checkMsg}
                             onDelete={this.deleteDoneMsg} />
                     </div>
@@ -252,15 +276,16 @@ class App extends PureComponent {
                         onBlur={this.handleInputBlur}
                         onEnter={this.handleInputEnter} />
                 </div>
-                {
-                    openTool &&
-                    <Tool onClose={this.handleToggleTool}>
+                <Tool isActive={openTool} onClose={this.handleToggleTool}>
+                    <ToolTip title="导出配置">
                         <ToolBtn type='download' onClick={this.handleSave}/>
+                    </ToolTip>
+                    <ToolTip title="导入配置">
                         <Uploader type={ACCEPT_TYPE.JSON} onChange={this.handleRead}>
                             <ToolBtn type='upload'/>
                         </Uploader>
-                    </Tool>
-                }
+                    </ToolTip>
+                </Tool>
             </div>
         );
     }

@@ -1,4 +1,4 @@
-.todo-app {
+#todo-app {
     position: absolute;
     width: 310px;
     height: 300px;
@@ -46,14 +46,17 @@
             background: rgba(255, 255, 255, 0.2);
             opacity: .4;
         }
-        .todo-list {
-            font-size: 20px;
-        }
-        .done-list {
-            font-size: 12px;
-            li {
-                opacity: .5;
+        li {
+            font-size: 16px;
+            .message {
+                opacity: 1;
+            }
+            &.checked {
+                font-size: 12px;
                 text-decoration: line-through;
+                .message {
+                    opacity: .5;
+                }
             }
         }
         &.focus {

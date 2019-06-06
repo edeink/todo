@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import cs from 'classnames';
+// import cs from 'classnames';
 import './index.scss';
 
 export default class Tags extends PureComponent {
@@ -14,13 +14,13 @@ export default class Tags extends PureComponent {
             return null;
         }
         return (
-            <div className='tags'>
+            <span className='tags'>
                 {
                     data.map(function (eachData) {
-                        return <div className='tag' key={eachData}>{eachData}</div>
+                        return <span className='tag' key={eachData}>{eachData}</span>
                     })
                 }
-            </div>
+            </span>
         )
     }
 }

@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import cs from 'classnames';
+// import cs from 'classnames';
 import './index.scss';
 
 export default class HyperLink extends PureComponent {
@@ -27,9 +27,9 @@ export default class HyperLink extends PureComponent {
     render() {
         const {data} = this.props.data;
         return (
-            <div className='hyperlink'>
-                <a href='javascript:;' onClick={() => {this.jumpTo(data.link)}}>{data.value}</a>
-            </div>
+            <span className='hyperlink'>
+                <button onClick={() => {this.jumpTo(data.link)}}>{data.value}</button>
+            </span>
         )
     }
 }

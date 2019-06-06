@@ -9,12 +9,17 @@ class ToolBtn extends PureComponent {
         type: PropTypes.string,
         onClick: PropTypes.func,
         onClose: PropTypes.func,
+        onMouseEnter: PropTypes.func,
+        onMouseLeave: PropTypes.func,
     };
 
     render() {
-        const {type, onClick} = this.props;
+        const {type, onClick, onMouseEnter, onMouseLeave} = this.props;
         return (
-            <div className="tool-btn" onClick={onClick}>
+            <div className="tool-btn"
+                 onMouseEnter={onMouseEnter}
+                 onMouseLeave={onMouseLeave}
+                 onClick={onClick}>
                 <i className={`iconfont icon-${type}`}/>
             </div>
         )
@@ -28,14 +33,15 @@ export default class Tool extends PureComponent {
     static Btn = ToolBtn;
 
     static propTypes = {
+        isActive: PropTypes.bool.isRequired,
         children: PropTypes.array,
     };
 
     render() {
-        const {children, onClose} = this.props;
+        const {isActive, children, onClose} = this.props;
         return (
-            <div className="tool">
-                { children }
+            <div className={cs('tool', {'is-active': isActive})}>
+                { isActive && children }
                 <CloseBtn onClick={onClose}/>
             </div>
         )

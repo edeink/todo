@@ -50,6 +50,6 @@ yarn clear && yarn build && yarn dist # 构建
       - 标签：`[A, B]`
     - [x] 部分行级Markdown语法
       - 超链接：`[baidu](https://www.baidu.com)`
-      - 强调：`*xxx*`、`**xxx**`、`***xxx**&`
+      - 强调：`*xxx*`、`**xxx**`、`***xxx***`
       - 修饰：\``code`\`、`~~delete~~`
   - [ ] 输入时高亮

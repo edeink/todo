@@ -20,4 +20,34 @@
     &.busy {
         background: rgba(255, 0, 0, .6);
     }
+    &:before {
+        content: '';
+        position: absolute;
+        right: 6px;
+        top: 6px;
+        display: block;
+        width: 0;
+        height: 0;
+        border-radius: 100%;
+        background: rgba(0, 0, 0, .5);
+        transform: translate(50%, -50%);
+        opacity: 0;
+        transition: width .2s ease-in, height .2s ease-in, transform .2s ease-in, opacity .2s ease-in;
+        z-index: -1;
+    }
+    &:hover {
+        &:before {
+            width: 40px;
+            height: 40px;
+            opacity: 1;
+
+        }
+    }
+    &.is-active {
+        &:before {
+            width: 800px;
+            height: 800px;
+            opacity: 1;
+        }
+    }
 }

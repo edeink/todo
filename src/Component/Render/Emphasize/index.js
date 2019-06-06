@@ -1,6 +1,6 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-import cs from 'classnames';
+// import cs from 'classnames';
 import './index.scss';
 
 export default class Emphasize extends PureComponent {
@@ -11,7 +11,7 @@ export default class Emphasize extends PureComponent {
     render() {
         const {key, data} = this.props.data;
         return (
-            <div className={key}>{data}</div>
+            <span className={key}>{data}</span>
         )
     }
 }

@@ -9,12 +9,14 @@
   "dependencies": {
     "classnames": "^2.2.6",
     "cross-env": "^5.2.0",
+    "fast-json-stringify": "^1.15.3",
     "node-sass": "^4.11.0",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
     "react-beautiful-dnd": "^11.0.2",
     "react-dom": "^16.8.6",
     "react-scripts": "2.1.8",
+    "react-transition-group": "1.x",
     "typescript": "^3.4.3"
   },
   "scripts": {
