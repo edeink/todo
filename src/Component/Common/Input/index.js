@@ -2,10 +2,10 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import cs from 'classnames';
 
-import CloseBtn from '../CloseBtn';
-import Tip from '../Tip';
+import CloseBtn from '../CloseBtn/index';
+import Tip from '../../Exclusive/Tip/index';
 
-import KEYCODE from '../../config/keycode';
+import KEYCODE from '../../../tool/keycode';
 
 import './index.scss';
 

@@ -1,15 +1,23 @@
 // import fastJson from 'fast-json-stringify';
-// >2d 13:20 [A, B] 所有的[格式](www.baidu.com) *能* **否** ***正*** `常` ~~展~~ 示？
+import TODO_CONFIG from '../config';
+
+const {RENDER_ACTIVE_KEY, RENDER_STRING_KEY} = TODO_CONFIG;
 
 // 该方法只针对列表数据，用以过滤不必要的数据
 const stringify = function (array) {
-    let newArray = [];
-    array.forEach((eachData) => {
-        newArray.push({
-            value: eachData.value
+    if(array.length === 0) {
+        return '[]'
+    } else {
+        let newArray = [];
+        array.forEach((eachData) => {
+            newArray.push({
+                value: eachData.value,
+                [RENDER_ACTIVE_KEY]: eachData[RENDER_ACTIVE_KEY],
+                [RENDER_STRING_KEY]: eachData[RENDER_STRING_KEY],
+            });
         });
-    });
-    return JSON.stringify(newArray) ;
+        return JSON.stringify(newArray) ;
+    }
 };
 
 // 一个包含错误处理的parse
@@ -26,4 +34,8 @@ const parse = function(value, defaultValue) {
     return data;
 };
 
-export {stringify, parse};
+const copy = function (obj) {
+    return JSON.parse(JSON.stringify(obj));
+};
+
+export {stringify, parse, copy};

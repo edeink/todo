@@ -38,6 +38,12 @@
         margin-left: 6px;
         padding-right: 16px;
         color: rgba(255, 255, 255, 0.9);
+        &.is-active {
+            display: inline-block;
+            //animation-duration: 5s;
+            //animation-delay: 4s;
+            animation-iteration-count: infinite;
+        }
         &.checked {
             text-decoration: line-through;
         }

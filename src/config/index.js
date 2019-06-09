@@ -13,7 +13,8 @@ const TODO_CONFIG = {
     STORE_DONE_KEY: '__doneList',
     // 显示层次的key
     RENDER_PARSE_KEY: '__parseData',
-    RENDER_EM_KEY: '__em',
+    RENDER_ACTIVE_KEY: '__active',
+    RENDER_STRING_KEY: '__string',
 };
 
 export default TODO_CONFIG;

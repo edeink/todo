@@ -67,6 +67,10 @@ function createWindow() {
             win.hide();
         }
     });
+
+    // 系统通知
+    app.setAppUserModelId("todo.edeity.me"); // set appId from package.json
+    // autoUpdater.checkForUpdatesAndNotify();
 }
 
 app.on('ready', createWindow);

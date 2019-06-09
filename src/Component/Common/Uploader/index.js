@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 // import cs from 'classnames';
 import './index.scss';
-import fileHelper from "../../tool/file";
+import fileHelper from "../../../tool/file";
 
 const ACCEPT_TYPE = {
     JSON: 'json',

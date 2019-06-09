@@ -1,21 +1,21 @@
-import React, { PureComponent } from 'react';
+import React, {PureComponent} from 'react';
 import cs from 'classnames';
 
-import Category from './Component/Category';
-import Tip from './Component/Tip';
-import Status from './Component/Status';
-import Input from './Component/Input';
-import UndoList from './Component/UndoList';
-import Tool, {ToolBtn} from './Component/Tool';
-import Uploader, {ACCEPT_TYPE} from "./Component/Uploader";
-import ToolTip from './Component/ToolTip';
+import Category from './Component/Exclusive/Category';
+import Tip from './Component/Exclusive/Tip';
+import Status from './Component/Exclusive/Status';
+import Input from './Component/Common/Input';
+import UndoList from './Component/Exclusive/UndoList';
+import Tool, {ToolBtn} from './Component/Exclusive/Tool';
+import Uploader, {ACCEPT_TYPE} from "./Component/Common/Uploader";
+import ToolTip from './Component/Common/ToolTip';
 
 import TODO_CONFIG from './config';
 import fileHelper from './tool/file';
-import {stringify, parse} from './tool/json';
+import {stringify, parse, copy} from './tool/json';
 
 import './app.scss';
-import './icons.scss';
+import './icon/icons.scss';
 import parser from "./tool/parser";
 
 const store = window.localStorage;
@@ -29,13 +29,13 @@ const ANIMATE = {
 const {
     CATEGORY_LIST, LIMIT_WORDS,
     STORE_TODO_KEY, STORE_DONE_KEY, STORE_CATEGORY_KEY,
-    RENDER_EM_KEY, RENDER_PARSE_KEY
+    RENDER_ACTIVE_KEY, RENDER_PARSE_KEY, RENDER_STRING_KEY
 } = TODO_CONFIG;
 const LIST_KEYS = [STORE_TODO_KEY, STORE_DONE_KEY];
 const INIT_CATEGORY_KEY = CATEGORY_LIST[0].key;
 
 // 性能打桩
-const TIME_KEY =  {
+const TIME_KEY = {
     TEST_PARSER: '【解析数据】解析输入文本耗时：',
     ALL_DATA_READ_AND_RENDER: '【所有数据】读取 & 渲染耗时：',
     ALL_LIST_READ_AND_RENDER: '【列表数据】读取 & 渲染耗时：',
@@ -65,7 +65,9 @@ class App extends PureComponent {
         this._readData(() => {
             this.brieflyCloseAnimate();
         });
+    }
 
+    __testRender() {
         // console.time(TIME_KEY.TEST_PARSER);
         // const str = '>2d 13:20 [A, B] 所有的[格式](www.baidu.com) *能* **否** ***正*** `常` ~~展~~ 示？';
         // const testTimes = 100;
@@ -87,6 +89,7 @@ class App extends PureComponent {
         console.time(TIME_KEY.ALL_DATA_READ_AND_RENDER);
         const category = parse(store.getItem(STORE_CATEGORY_KEY), CATEGORY_LIST);
         const categoryKey = category[0].key;
+        console.time(TIME_KEY.ALL_LIST_READ_AND_RENDER);
         this._readList(callback);
         this.setState({
             category,
@@ -99,7 +102,6 @@ class App extends PureComponent {
     };
     // 读取每列数据
     _readList = (callback) => {
-        console.time(TIME_KEY.ALL_LIST_READ_AND_RENDER);
         const {categoryKey} = this.state;
         LIST_KEYS.forEach((eachKey) => {
             const storeKey = getRealStoreKey(categoryKey, eachKey);
@@ -107,6 +109,7 @@ class App extends PureComponent {
             tempData.forEach(function (eachData) {
                 if (!eachData[RENDER_PARSE_KEY]) {
                     eachData[RENDER_PARSE_KEY] = parser.parse(eachData.value);
+                    eachData[RENDER_STRING_KEY] = eachData[RENDER_PARSE_KEY][0][RENDER_STRING_KEY];
                 }
             });
             this.setState({
@@ -122,30 +125,43 @@ class App extends PureComponent {
     insertOneData = (data, storeKey, isEnter) => {
         const {categoryKey} = this.state;
         const preData = this.state[storeKey];
-        const {tip, index} = Tip.getTip(data.value, preData, !isEnter);
+
+        // 解析该行命令
+        const newData = [...preData];
+        if (!data[RENDER_PARSE_KEY]) {
+            data[RENDER_PARSE_KEY] = parser.parse(data.value);
+        }
+        // 假如之前是激活状态，则不再激活该list（作用域切换）
+        if (data[RENDER_ACTIVE_KEY] === true) {
+            data[RENDER_ACTIVE_KEY] = false;
+        }
+        if (!data[RENDER_STRING_KEY]) {
+            data[RENDER_STRING_KEY] = data[RENDER_PARSE_KEY][0][RENDER_STRING_KEY];
+        }
+
+        // 校验数据是否合法
+        const {tip, index} = Tip.getTip(data[RENDER_STRING_KEY], newData, !isEnter);
         if (tip) {
             Tip.showTip(tip);
             if (index >= 0) {
-                this.shakeData(index, storeKey);
+                this.handleActive(index, storeKey, true);
             }
             return false;
         }
         if (isEnter === true) {
             const antiStoreKey = getAntiStoreKey(storeKey);
             const antiData = this.state[antiStoreKey];
-            const {tip: antiTip, index} = Tip.getTip(data.value, antiData, true);
+            const {tip: antiTip, index} = Tip.getTip(data[RENDER_STRING_KEY], antiData, true);
             if (antiTip) {
                 Tip.showTip(antiTip);
-                if (index >=0) {
-                    this.shakeData(index, antiStoreKey);
+                if (index >= 0) {
+                    this.handleActive(index, antiStoreKey, true);
                 }
                 return false;
             }
         }
-        const newData = [...preData];
-        if (!data[RENDER_PARSE_KEY]) {
-            data[RENDER_PARSE_KEY] = parser.parse(data.value);
-        }
+
+        // 更改数据
         newData.unshift(data);
         const realStoreKey = getRealStoreKey(categoryKey, storeKey);
         store.setItem(realStoreKey, stringify(newData));
@@ -159,7 +175,7 @@ class App extends PureComponent {
         const preData = this.state[storeKey];
         const antiKey = getAntiStoreKey(storeKey);
         const deleteOneData = preData[index];
-        if(this.insertOneData(deleteOneData, antiKey)) {
+        if (this.insertOneData(deleteOneData, antiKey)) {
             this.deleteOneData(index, storeKey, true);
         }
     };
@@ -186,6 +202,7 @@ class App extends PureComponent {
         const realStoreKey = getRealStoreKey(categoryKey, storeKey);
         store.setItem(realStoreKey, stringify(listData));
     };
+
     /**
      * 对列表进行相关的数据操作 END
      */
@@ -193,18 +210,26 @@ class App extends PureComponent {
     /**
      * 前端交互事件 START
      */
-    // 摇动一个数据以引起别人注意
-    shakeData = (index, storeKey) => {
+        // 摇动一个数据以引起别人注意
+    handleActive = (index, storeKey, tempShake) => {
         const preData = this.state[storeKey];
-        preData[index][RENDER_EM_KEY] = true;
+        const newData = copy(preData);
+        let tempData = newData[index];
+        tempData[RENDER_ACTIVE_KEY] = true;
         this.setState({
-            [storeKey]: [...preData]
-        }, () => {
-            preData[index][RENDER_EM_KEY] = false;
-            this.setState({
-                [storeKey]: [...preData]
-            })
+            [storeKey]: [...newData]
         });
+        if(tempShake === true) {
+            setTimeout(() => {
+                this.brieflyCloseAnimate();
+                let newTempData = copy(tempData);
+                newTempData[RENDER_ACTIVE_KEY] = false;
+                newData[index] = newTempData;
+                this.setState({
+                    [storeKey]: [...newData]
+                })
+            }, 1000);
+        }
     };
     // 短暂关闭动画
     brieflyCloseAnimate = () => {
@@ -226,12 +251,12 @@ class App extends PureComponent {
         });
     };
     handleSave = () => {
-        const { category } = this.state;
+        const {category} = this.state;
         let saveObj = {};
         saveObj.category = category;
         saveObj.data = {};
         category.forEach((eachCategory) => {
-            const { key } = eachCategory;
+            const {key} = eachCategory;
             LIST_KEYS.forEach(function (eachKey) {
                 const tempStoreKey = getRealStoreKey(key, eachKey);
                 saveObj.data[tempStoreKey] = parse(store.getItem(tempStoreKey), []);
@@ -252,10 +277,10 @@ class App extends PureComponent {
         });
     };
     handleInputFocus = () => {
-        this.setState({ focus: true });
+        this.setState({focus: true});
     };
     handleInputBlur = () => {
-        this.setState({ focus: false });
+        this.setState({focus: false});
     };
     handleInputEnter = (value) => {
         return this.insertOneData({
@@ -263,17 +288,18 @@ class App extends PureComponent {
         }, STORE_TODO_KEY, true);
     };
     handleToggleTool = () => {
-        const { openTool } = this.state;
+        const {openTool} = this.state;
         this.setState({
             openTool: !openTool
         })
     };
+
     /**
      * 前端交互事件 END
      */
 
     render() {
-        const { focus, category, categoryKey, openTool, enableAnimate, todoEnterAnimate } = this.state;
+        const {focus, category, categoryKey, openTool, enableAnimate, todoEnterAnimate} = this.state;
         const todoData = this.state[STORE_TODO_KEY];
         const doneData = this.state[STORE_DONE_KEY];
         return (
@@ -282,8 +308,8 @@ class App extends PureComponent {
 
                     {/* 分类 */}
                     <Category activeKey={categoryKey}
-                        options={category}
-                        onChange={this.changeCategory} />
+                              options={category}
+                              onChange={this.changeCategory}/>
                     {/* 其它提示 */}
                     <Tip/>
                     {/* 当前状态栏 */}
@@ -302,7 +328,8 @@ class App extends PureComponent {
                             transitionLeave={false}
                             onSelect={this.toggleOneData}
                             onDelete={this.deleteOneData}
-                            onDrag={this.dragData} />
+                            onDrag={this.dragData}
+                            onActive={this.handleActive}/>
                         {
                             doneData.length > 0 &&
                             <div className="done-split"/>
@@ -317,16 +344,16 @@ class App extends PureComponent {
                             transitionEnter={enableAnimate}
                             transitionLeave={false}
                             onSelect={this.toggleOneData}
-                            onDelete={this.deleteOneData} />
+                            onDelete={this.deleteOneData}/>
                     </div>
 
                     {/* 输入框 */}
                     <Input
-                        className={cs({ "focus": focus })}
+                        className={cs({"focus": focus})}
                         max={LIMIT_WORDS}
                         onFocus={this.handleInputFocus}
                         onBlur={this.handleInputBlur}
-                        onEnter={this.handleInputEnter} />
+                        onEnter={this.handleInputEnter}/>
                 </div>
                 <Tool isActive={openTool} onClose={this.handleToggleTool}>
                     <ToolTip title="导出配置">

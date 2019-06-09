@@ -4,20 +4,23 @@ import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
 import {CSSTransitionGroup} from 'react-transition-group'
 import cs from 'classnames';
 
-import Checkbox from '../Checkbox';
-import CloseBtn from '../CloseBtn';
-import Time from '../Render/Time';
-import Tags from '../Render/Tags';
-import Text from '../Render/Text';
-import HyperLink from '../Render/HyperLink';
-import Emphasize from '../Render/Emphasize';
-import Code from '../Render/Code';
-import Delete from '../Render/Delete';
+import Checkbox from '../../Common/Checkbox/index';
+import CloseBtn from '../../Common/CloseBtn/index';
+import Time from '../../Render/Time/index';
+import Tags from '../../Render/Tags/index';
+import Text from '../../Render/Text/index';
+import HyperLink from '../../Render/HyperLink/index';
+import Emphasize from '../../Render/Emphasize/index';
+import Code from '../../Render/Code/index';
+import Delete from '../../Render/Delete/index';
 
-import {TOKEN_TYPE} from '../../tool/parser';
-import {stringify} from "../../tool/json";
+import {TOKEN_TYPE} from '../../../tool/parser';
+import {stringify} from "../../../tool/json";
+import TODO_CONFIG from '../../../config';
 
 import './index.scss';
+
+const {RENDER_PARSE_KEY, RENDER_ACTIVE_KEY} = TODO_CONFIG;
 
 // 拖拽的样式
 const getItemStyle = (isDragging, draggableStyle) => ({
@@ -75,38 +78,47 @@ export default class UndoList extends Component {
         if (list.length !== nextProps.list.length) {
             return true;
         }
-        if (stringify(list) !== stringify(nextProps.list)) {
+        let preList = stringify(list);
+        let newList = stringify(nextProps.list);
+        if (preList !== newList) {
             return true;
         }
         return false;
     }
 
-    _renderLi(eachList, isDragging) {
-        // const {checked} = this.props;
-        let collect = eachList.__parseData;
+    onActive = (index) => {
+        const {storeKey, onActive} = this.props;
+        onActive(index, storeKey);
+    };
+
+    _renderLi(eachList, index, isDragging) {
+        const {checked} = this.props;
+        let collect = eachList[RENDER_PARSE_KEY];
+        let isActive = eachList[RENDER_ACTIVE_KEY];
         return (
-            <div className='message'>
+            <div className={cs('message', {'is-active animated tada': isActive && !checked})}>
                 {
                     collect.map((eachData) => {
                         let key = eachData.begin + eachData.content;
                         switch (eachData.key) {
                             case TOKEN_TYPE.TIME:
-                                return <Time key={key} data={eachData}/>
+                                return <Time key={key} index={index} onActive={this.onActive}
+                                             data={eachData} disabled={checked}/>;
                             case TOKEN_TYPE.Tag:
-                                return <Tags key={key} data={eachData}/>
+                                return <Tags key={key} data={eachData}/>;
                             case TOKEN_TYPE.HYPERLINK:
-                                return <HyperLink key={key} data={eachData}/>
+                                return <HyperLink key={key} data={eachData}/>;
                             case TOKEN_TYPE.ITALIC:
                             case TOKEN_TYPE.EM:
                             case TOKEN_TYPE.EM_ITALIC:
-                                return <Emphasize key={key} data={eachData}/>
+                                return <Emphasize key={key} data={eachData}/>;
                             case TOKEN_TYPE.CODE:
-                                return <Code key={key} data={eachData}/>
+                                return <Code key={key} data={eachData}/>;
                             case TOKEN_TYPE.DELETE:
-                                return <Delete key={key} data={eachData}/>
+                                return <Delete key={key} data={eachData}/>;
                             case TOKEN_TYPE.TEXT:
                             default:
-                                return <Text key={key} data={eachData}/>
+                                return <Text key={key} data={eachData}/>;
                         }
                     })
                 }
@@ -116,9 +128,10 @@ export default class UndoList extends Component {
 
     _renderUndoLi(index, eachList) {
         const {small, checked, storeKey, onSelect, onDelete, onDrag} = this.props;
+        const isActive = eachList[RENDER_ACTIVE_KEY] === true ? 1 : 0;
         return (
             <Draggable
-                key={eachList.value}
+                key={eachList.value + isActive}
                 index={index}
                 isDragDisabled={!onDrag}
                 draggableId={eachList.value + index}>
@@ -140,7 +153,7 @@ export default class UndoList extends Component {
                                 onSelect(index, value, storeKey)
                             }}/>
                         {
-                            this._renderLi(eachList, snapshot.isDragging,)
+                            this._renderLi(eachList, index, snapshot.isDragging)
                         }
 
                         <CloseBtn onClick={(event) => {

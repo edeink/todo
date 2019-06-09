@@ -1,9 +1,11 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import cs from 'classnames';
-import './index.scss';
 
-import eventHelper from '../../tool/event';
+import eventHelper from '../../../tool/event';
+import TODO_CONFIG from '../../../config';
+
+import './index.scss';
 
 export default class Tip extends PureComponent {
 
@@ -32,8 +34,9 @@ export default class Tip extends PureComponent {
     static getTip(value, message, isAnti) {
         const length = value.length;
         let findIndex = -1;
+        let stringKey = TODO_CONFIG.RENDER_STRING_KEY;
         message.some((eachMessage, index) => {
-            if (eachMessage.value === value) {
+            if (eachMessage[stringKey] === value) {
                 findIndex = index;
                 return true;
             }

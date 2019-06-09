@@ -1,6 +1,9 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 // import cs from 'classnames';
+
+import {goToUrl} from "../../../tool/adaptor";
+
 import './index.scss';
 
 export default class HyperLink extends PureComponent {
@@ -13,15 +16,7 @@ export default class HyperLink extends PureComponent {
             url = `https://${url}`;
 
         }
-
-        try {
-            const { shell } = window.require('electron');
-            shell.openExternal(url);
-        } catch (e) {
-            window.open(url, '_blank');
-        }
-
-
+        goToUrl(url);
     }
 
     render() {

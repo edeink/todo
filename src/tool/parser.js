@@ -1,6 +1,8 @@
+import TODO_CONFIG from '../config';
+
 const TOKEN_TYPE = {
     TIME: 'time',
-    Tag: 'tag',
+    TAG: 'tag',
     TEXT: 'text',
     // 以下为MD的格式
     HYPERLINK: 'hyperlink',
@@ -27,8 +29,10 @@ const SPECIAL_SYMBOL = {
 const pauseSymbol = ['[', ']', '>', '`', '*', '~'];
 
 /**
- *  基本格式： >2d 15:13 [tag1, tag2] your plan
- *  属于：自定义命令 + 正文内容
+ *  基本格式：
+ *  自定义命令 + 正文内容
+ *  eg: >2d 15:13 [tag1, tag2] your plan
+ *
  *  自定义命令：
  *   - >2d 15:30 >日期 时间
  *      - >2d: 两天之后
@@ -44,13 +48,16 @@ const pauseSymbol = ['[', ']', '>', '`', '*', '~'];
  *   - *xxx* // italic
  *   - **xxx** // 强调
  *   - ***xxx*** // 强调 & italic
- * 每个单元的返回的通用结果
+ *
+ * 每个单元的返回的通用结果：
  * result: {
  *     startIndex: xxx,
  *     endIndex: xxx,
  *     key: xxx, // 代表所属语义
  *     content: xxx,
- *     data: '' // 由content转化的data
+ *     data: {
+ *         value: ''
+ *     }
  * }
  */
 
@@ -61,7 +68,6 @@ const parser = {
             console.log('输入的数据有误，请确保输入源为非空字符串');
             return false;
         }
-        debugger
         txt = txt.trim();
         let length = txt.length;
         let offset = 0;
@@ -97,6 +103,8 @@ const parser = {
             let textResult = parser.getText(txt, startTextIndex);
             collection.push(textResult);
         }
+        // 默认完整的解析在第一个结构中
+        collection[0][TODO_CONFIG.RENDER_STRING_KEY] = explain.getMessage(collection);
         // console.log(`执行解析数据: ${txt}`);
         console.log(`txt: ${txt}, parseData:`, collection);
         return collection;
@@ -121,11 +129,11 @@ const parser = {
                     break;
                 }
                 case SPECIAL_SYMBOL.STAR: {
-                    result = parser.starParse(txt, offset);
+                    result = parser.emParse(txt, offset);
                     break;
                 }
                 case SPECIAL_SYMBOL.WAVE: {
-                    result = parser.deleteParse(txt, offset);
+                    result = parser.delLineParse(txt, offset);
                     break;
                 }
                 default: {
@@ -137,7 +145,7 @@ const parser = {
         return result;
     },
     getText(txt, offset, nextOffset) {
-        if(typeof nextOffset !== 'undefined') {
+        if (typeof nextOffset !== 'undefined') {
             const content = txt.substring(offset, nextOffset + 1);
             return {
                 begin: offset,
@@ -161,9 +169,10 @@ const parser = {
             }
         }
     },
-    deleteParse(txt, offset) {
+    // 删除线
+    delLineParse(txt, offset) {
         txt = txt.substr(offset);
-        if(txt[1] !== SPECIAL_SYMBOL.WAVE) {
+        if (txt[1] !== SPECIAL_SYMBOL.WAVE) {
             return null;
         }
         let end = txt.indexOf('~~', 3);
@@ -175,20 +184,23 @@ const parser = {
             end: end + offset + 1,
             key: TOKEN_TYPE.DELETE,
             content: txt.substring(0, end + 2),
-            data: txt.substring(2, end),
+            data: {
+                value: txt.substring(2, end),
+            }
         }
     },
-    starParse(txt, offset) {
+    // 加强等级
+    emParse(txt, offset) {
         txt = txt.substr(offset);
         let end = 0;
         let key = null;
         let content = null;
-        let data = null;
+        let value = null;
 
         // 期望加强等级
         let expectLevel = 0;
-        if(txt[1] === SPECIAL_SYMBOL.STAR) {
-            if(txt[2] === SPECIAL_SYMBOL.STAR) {
+        if (txt[1] === SPECIAL_SYMBOL.STAR) {
+            if (txt[2] === SPECIAL_SYMBOL.STAR) {
                 expectLevel = 2;
             } else {
                 expectLevel = 1;
@@ -198,7 +210,7 @@ const parser = {
         let realLevel = -1;
 
         // 以下代码暂不循环了，罗列所有情况，这样直观一点
-        switch(expectLevel) {
+        switch (expectLevel) {
             case 0: {
                 end = txt.indexOf('*', 2);
                 if (end !== -1) {
@@ -224,7 +236,7 @@ const parser = {
                     end = txt.indexOf('**', 4);
                     if (end === -1) {
                         end = txt.indexOf('*', 4);
-                        if(end !== -1) {
+                        if (end !== -1) {
                             realLevel = 0;
                         }
                     } else {
@@ -238,27 +250,27 @@ const parser = {
             default: // do nothing
         }
 
-        if(realLevel === -1) {
+        if (realLevel === -1) {
             return null;
         }
         // 最后得出结果
         switch (realLevel) {
             case 0: {
                 key = TOKEN_TYPE.ITALIC;
-                data = txt.substring(1, end);
+                value = txt.substring(1, end);
                 content = txt.substring(0, end + 1);
                 break;
             }
             case 1: {
                 key = TOKEN_TYPE.EM;
-                data = txt.substring(2, end);
+                value = txt.substring(2, end);
                 end = end + 1;
                 content = txt.substring(0, end + 1);
                 break;
             }
             case 2: {
                 key = TOKEN_TYPE.EM_ITALIC;
-                data = txt.substring(3, end);
+                value = txt.substring(3, end);
                 end = end + 2;
                 content = txt.substring(0, end + 1);
                 break;
@@ -270,9 +282,10 @@ const parser = {
             end: end + offset,
             key,
             content,
-            data
+            data: {value}
         }
     },
+    // 代码块
     codeParse(txt, offset) {
         txt = txt.substr(offset);
         let end = 0;
@@ -287,7 +300,9 @@ const parser = {
                 end: end + offset,
                 key: TOKEN_TYPE.CODE,
                 content: txt.substring(0, end + 1),
-                data: txt.substring(1, end)
+                data: {
+                    value: txt.substring(1, end)
+                }
             }
         }
     },
@@ -296,7 +311,7 @@ const parser = {
         let end = 0;
         let content = null;
         let data = null;
-        let key = TOKEN_TYPE.Tag;
+        let key = TOKEN_TYPE.TAG;
 
         end = txt.indexOf(SPECIAL_SYMBOL.RIGHT_QUOTE);
 
@@ -307,7 +322,7 @@ const parser = {
         content = txt.substring(0, end + 1);
         let preData = txt.substring(1, end);
         // 假如是超链接
-        if(txt[end + 1] === SPECIAL_SYMBOL.LEFT_SMALL_QUOTE) {
+        if (txt[end + 1] === SPECIAL_SYMBOL.LEFT_SMALL_QUOTE) {
             let endSmall = txt.indexOf(SPECIAL_SYMBOL.RIGHT_SMALL_QUOTE);
             if (endSmall !== -1) {
                 content = txt.substring(0, endSmall + 1);
@@ -318,22 +333,32 @@ const parser = {
                 };
                 end = endSmall;
             }
+            return {
+                begin: offset,
+                end: end + offset,
+                key,
+                content,
+                data
+            }
         } else {
             // 是普通分类
-            data = preData.split(SPECIAL_SYMBOL.COMMA);
-            data = data.map((eachData) => {
+            let tags = preData.split(SPECIAL_SYMBOL.COMMA);
+            tags = tags.map((eachData) => {
                 return eachData.trim();
             });
-        }
-
-        return {
-            begin: offset,
-            end: end + offset,
-            key,
-            content,
-            data
+            return {
+                begin: offset,
+                end: end + offset,
+                key,
+                content,
+                data: {
+                    tags,
+                    value: tags.join('、')
+                }
+            }
         }
     },
+    // 时间
     timeParse(txt, offset) {
         txt = txt.substr(offset);
         let firIndex = txt.indexOf(' ');
@@ -342,6 +367,7 @@ const parser = {
 
         if (secIndex !== -1) {
             let clock = txt.substring(firIndex + 1, secIndex); // 选中的时间
+            let timeStamp = explain.getTimeStamp(delay, clock);
             return {
                 begin: offset,
                 end: secIndex + offset,
@@ -349,12 +375,14 @@ const parser = {
                 key: TOKEN_TYPE.TIME,
                 data: {
                     delay,
-                    clock
+                    clock,
+                    timeStamp,
+                    value: clock
                 }
             }
         } else {
             // 处理只有>，后面无命令的情况
-            if(txt[1] === ' ') {
+            if (txt[1] === ' ') {
                 return;
             }
             return {
@@ -372,6 +400,7 @@ const parser = {
     test() {
         const testData = [
             // // 时间
+            // '>2d 13:20 常规的时间',
             // '>1s 推迟一秒',
             // '> 15:30 没有推迟时间的时间输入',
             // '> 错误的时间输入',
@@ -380,18 +409,22 @@ const parser = {
             // '巴拉巴拉 >2d 24:30 时间解析不解析', // 应该解析
             // '>2d 13 半个时间',
             // '> 周六 中文的时间',
+
             // // 分类
             // ' [hahah, lalala] 正常的分类输入',
             // '[ 错误的分类输入',
             // '[只有分类]',
             // '巴拉巴拉 [出现在中间, 的分类] 分类解析不解析', // 应该解析
+
             // // 超链接
             // '我跟你讲，[baidu](https://www.baidu.com)真的很好用',
             // '假如[分类][链接](https://www.baidu.com)同时存在',
-            // 代码
+
+            // // 代码
             // '代码`console.log("aa")`部分',
             // '这种情况``应该解析为纯文本',
-            // 强调
+
+            // // 强调
             // '* italic *文本',
             // '**em ** 强调',
             // '*** italic&em ***强调和意大利',
@@ -399,18 +432,85 @@ const parser = {
             // '***fa*', // 应该被解析成Italic
             // '***fa**', // 应该被解析成em
             // '****fa***', // 应该被解析成Italic & em
-            // 删除线
-            // '~~aaa~~ 你好啊',
-            // 完整的功能
-            // '>2d 13:20 [A, B] 所有的[格式](www.baidu.com) *能* **否** ***正*** `常` ~~展~~ 示？',
 
-            // 其他错误的发现
+            // // 删除线
+            // '~~aaa~~ 你好啊',
+
+            // // 完整的功能
+            '>2d 13:20 [A, B] 所有的[格式](www.baidu.com)*能***否*****正***`常`~~展~~示？',
+
+            // // 其他错误的发现
             // '0>2d 13:20 [A, B] 所有的[格式](www.baidu.com) *能* **否** ***正*** `常` ~~展~~ 示？0'
         ];
         testData.forEach(function (eachData) {
             parser.parse(eachData);
         });
     }
+};
+
+const TIME_UNIT = {
+    MINUTE: 'm',
+    HOURS: 'h',
+    DAY: 'd',
+};
+
+const TIME_UNIT_ARRAY = Object.values(TIME_UNIT);
+
+const explain = {
+    getTimeStamp(delay, clock) {
+        const now = new Date();
+        const year = now.getFullYear();
+        const month = now.getMonth();
+        let date = now.getDate();
+        let hour = now.getHours();
+        let minutes = now.getMinutes();
+        let second = 0;
+        // 分析delay
+        if (delay) {
+            let unit = delay[delay.length - 1];
+            let value = null;
+            if (TIME_UNIT_ARRAY.indexOf(unit) === -1) {
+                unit = TIME_UNIT.DAY;
+                value = delay;
+            } else {
+                value = parseInt(delay.substring(0, delay.length - 1));
+            }
+            switch (unit) {
+                case TIME_UNIT.MINUTE: {
+                    minutes += value;
+                    break;
+                }
+                case TIME_UNIT.HOURS: {
+                    hour += value;
+                    break;
+                }
+                case TIME_UNIT.DAY:
+                default:
+                    date += value;
+                    break;
+            }
+        }
+        // 分析时间
+        if (clock) {
+            let clockArray = clock.split(':');
+            hour = clockArray[0];
+            minutes = clockArray[1];
+        }
+        let newDate = new Date(year, month, date, hour, minutes, second);
+        return newDate.getTime();
+    },
+    getMessage(collection) {
+        let str = '';
+        collection.forEach(function (eachBlock) {
+            let eachData = eachBlock.data;
+            if (eachBlock.key === TOKEN_TYPE.TIME || eachBlock.key === TOKEN_TYPE.TAG) {
+
+            } else {
+                str += eachData.value;
+            }
+        });
+        return str;
+    },
 };
 
 parser.test();

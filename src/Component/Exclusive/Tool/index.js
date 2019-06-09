@@ -2,7 +2,7 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import cs from 'classnames';
 import './index.scss';
-import CloseBtn from "../CloseBtn";
+import CloseBtn from "../../Common/CloseBtn";
 
 class ToolBtn extends PureComponent {
     static propTypes = {
