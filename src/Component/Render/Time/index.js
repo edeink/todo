@@ -9,25 +9,27 @@ import './index.scss';
 
 export default class Time extends Component {
     static propTypes = {
-        index: PropTypes.number.isRequired,
+        index: PropTypes.number,
         data: PropTypes.object.isRequired,
         disabled: PropTypes.bool,
-        onActive: PropTypes.func.isRequired,
+        onActive: PropTypes.func,
     };
 
     componentDidMount() {
-        const {data, disabled} = this.props;
-        if (disabled !== true) {
-            const {data: timeData} = data;
-            let now = Date.now();
-            let timeStamp = timeData.timeStamp;
-            let diff = timeStamp - now;
-            if (diff  <= 0) {
-                this.notify();
-            } else {
-                this.timeoutKey = setTimeout(() => {
+        const {data, disabled, onActive} = this.props;
+        if (data && onActive) {
+            if (disabled !== true) {
+                const {data: timeData} = data;
+                let now = Date.now();
+                let timeStamp = timeData.timeStamp;
+                let diff = timeStamp - now;
+                if (diff  <= 0) {
                     this.notify();
-                }, diff);
+                } else {
+                    this.timeoutKey = setTimeout(() => {
+                        this.notify();
+                    }, diff);
+                }
             }
         }
     }

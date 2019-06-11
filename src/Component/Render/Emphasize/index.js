@@ -10,8 +10,11 @@ export default class Emphasize extends PureComponent {
 
     render() {
         const {key, data} = this.props.data;
+        if (!data) {
+            return null;
+        }
         return (
-            <span className={key}>{data}</span>
+            <span className={key}>{data.value}</span>
         )
     }
 }

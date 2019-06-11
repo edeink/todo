@@ -23,12 +23,16 @@ const notify = (title, body) => {
 };
 
 // 跳转URL
-const goToUrl = (url) => {
+const goToUrl = (url, errCb) => {
     try {
         const { shell } = window.require('electron');
         shell.openExternal(url);
     } catch (e) {
-        window.open(url, '_blank');
+        try {
+            window.open(url, '_blank');
+        } catch (e) {
+            errCb && errCb();
+        }
     }
 };
 

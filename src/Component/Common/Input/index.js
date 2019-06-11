@@ -4,14 +4,20 @@ import cs from 'classnames';
 
 import CloseBtn from '../CloseBtn/index';
 import Tip from '../../Exclusive/Tip/index';
+import UndoLi from "../../Exclusive/UndoList/UndoLi";
 
+import parser from "../../../tool/parser";
+import TODO_CONFIG from "../../../config";
 import KEYCODE from '../../../tool/keycode';
 
 import './index.scss';
 
+const {RENDER_PARSE_KEY} = TODO_CONFIG;
+
 export default class Input extends PureComponent {
     static propTypes = {
         className: PropTypes.string,
+        focus: PropTypes.bool,
         max: PropTypes.number,
         onFocus: PropTypes.func,
         onBlur: PropTypes.func,
@@ -41,7 +47,8 @@ export default class Input extends PureComponent {
     };
 
     // 输入框内容发生改变
-    handleInputChange = (value) => {
+    handleInputChange = (event) => {
+        let value = event.target.value;
         const {max, onChange} = this.props;
         if (max && value && value.length > max) {
             Tip.showTip('无法加载更多');
@@ -53,23 +60,36 @@ export default class Input extends PureComponent {
     };
 
     render() {
-        const {className, onFocus, onBlur} = this.props;
+        const {className, focus, onFocus, onBlur} = this.props;
         const {value} = this.state;
         const empty = value.length === 0;
+        const parseData = parser.parse(value, true);
+        const renderData = {
+            [RENDER_PARSE_KEY]: parseData
+        };
+
+        // focus && !empty && parseData &&
+
         return (
-            <div className={cs("input-wrapper", className, {'empty': empty})}>
-                <input
-                    ref={comp => {this.refInput = comp}}
-                    placeholder={' Enter 确认'}
-                    onFocus={onFocus}
-                    onBlur={onBlur}
-                    onChange={this.handleInputChange}
-                    onKeyPress={this.handleKeydown} />
+            <React.Fragment>
                 {
-                    !empty &&  
-                    <CloseBtn onClick={this.handleEmptyInput}/>
+                    parseData &&
+                    <UndoLi className="input-li" listData={renderData}/>
                 }
-            </div>
+                <div className={cs("input-wrapper", className, {'empty': empty, 'focus': focus})}>
+                    <input
+                        ref={comp => {this.refInput = comp}}
+                        placeholder={' Enter 确认'}
+                        onFocus={onFocus}
+                        onBlur={onBlur}
+                        onChange={this.handleInputChange}
+                        onKeyPress={this.handleKeydown} />
+                    {
+                        !empty &&
+                        <CloseBtn onClick={this.handleEmptyInput}/>
+                    }
+                </div>
+            </React.Fragment>
         )
     }
 }

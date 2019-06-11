@@ -1,33 +1,15 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {DragDropContext, Draggable, Droppable} from 'react-beautiful-dnd';
+import {DragDropContext, Droppable} from 'react-beautiful-dnd';
 import {CSSTransitionGroup} from 'react-transition-group'
 import cs from 'classnames';
 
-import Checkbox from '../../Common/Checkbox/index';
-import CloseBtn from '../../Common/CloseBtn/index';
-import Time from '../../Render/Time/index';
-import Tags from '../../Render/Tags/index';
-import Text from '../../Render/Text/index';
-import HyperLink from '../../Render/HyperLink/index';
-import Emphasize from '../../Render/Emphasize/index';
-import Code from '../../Render/Code/index';
-import Delete from '../../Render/Delete/index';
+import UndoLi from './UndoLi';
 
-import {TOKEN_TYPE} from '../../../tool/parser';
 import {stringify} from "../../../tool/json";
-import TODO_CONFIG from '../../../config';
 
 import './index.scss';
 
-const {RENDER_PARSE_KEY, RENDER_ACTIVE_KEY} = TODO_CONFIG;
-
-// 拖拽的样式
-const getItemStyle = (isDragging, draggableStyle) => ({
-    userSelect: 'none',
-    background: isDragging && 'rgba(255, 255, 255, 0.2)',
-    ...draggableStyle
-});
 const getListStyle = (isDraggingOver, refUl) => {
 };
 
@@ -91,83 +73,27 @@ export default class UndoList extends Component {
         onActive(index, storeKey);
     };
 
-    _renderLi(eachList, index, isDragging) {
-        const {checked} = this.props;
-        let collect = eachList[RENDER_PARSE_KEY];
-        let isActive = eachList[RENDER_ACTIVE_KEY];
-        return (
-            <div className={cs('message', {'is-active animated tada': isActive && !checked})}>
-                {
-                    collect.map((eachData) => {
-                        let key = eachData.begin + eachData.content;
-                        switch (eachData.key) {
-                            case TOKEN_TYPE.TIME:
-                                return <Time key={key} index={index} onActive={this.onActive}
-                                             data={eachData} disabled={checked}/>;
-                            case TOKEN_TYPE.Tag:
-                                return <Tags key={key} data={eachData}/>;
-                            case TOKEN_TYPE.HYPERLINK:
-                                return <HyperLink key={key} data={eachData}/>;
-                            case TOKEN_TYPE.ITALIC:
-                            case TOKEN_TYPE.EM:
-                            case TOKEN_TYPE.EM_ITALIC:
-                                return <Emphasize key={key} data={eachData}/>;
-                            case TOKEN_TYPE.CODE:
-                                return <Code key={key} data={eachData}/>;
-                            case TOKEN_TYPE.DELETE:
-                                return <Delete key={key} data={eachData}/>;
-                            case TOKEN_TYPE.TEXT:
-                            default:
-                                return <Text key={key} data={eachData}/>;
-                        }
-                    })
-                }
-            </div>
-        )
-    }
-
-    _renderUndoLi(index, eachList) {
+    _renderUndoLi(eachList, index,) {
         const {small, checked, storeKey, onSelect, onDelete, onDrag} = this.props;
-        const isActive = eachList[RENDER_ACTIVE_KEY] === true ? 1 : 0;
         return (
-            <Draggable
-                key={eachList.value + isActive}
+            <UndoLi
+                listData={eachList}
+                key={index}
                 index={index}
-                isDragDisabled={!onDrag}
-                draggableId={eachList.value + index}>
-                {(provided, snapshot) => (
-
-                    <li ref={provided.innerRef}
-                        className={cs("li", {"checked": checked})}
-                        {...provided.draggableProps}
-                        {...provided.dragHandleProps}
-                        style={getItemStyle(
-                            snapshot.isDragging,
-                            provided.draggableProps.style
-                        )}>
-
-                        <Checkbox
-                            small={small}
-                            checked={checked}
-                            onChange={(value) => {
-                                onSelect(index, value, storeKey)
-                            }}/>
-                        {
-                            this._renderLi(eachList, index, snapshot.isDragging)
-                        }
-
-                        <CloseBtn onClick={(event) => {
-                            onDelete(index, storeKey, event)
-                        }}/>
-                    </li>
-                )}
-            </Draggable>
+                small={small}
+                checked={checked}
+                storeKey={storeKey}
+                onSelect={onSelect}
+                onDelete={onDelete}
+                onDrag={onDrag}/>
         )
     }
 
     render() {
-        let {id, placeholder, className, list,
-            enterActive, leaveActive, transitionEnter, transitionLeave} = this.props;
+        let {
+            id, placeholder, className, list,
+            enterActive, leaveActive, transitionEnter, transitionLeave,
+        } = this.props;
 
         return (
             <DragDropContext onDragEnd={this.onDragEnd}>
@@ -196,8 +122,7 @@ export default class UndoList extends Component {
                                     transitionLeaveTimeout={200}>
                                     {
                                         list.map((eachList, index) => {
-                                            return this._renderUndoLi(index, eachList, provided.placeholder)
-
+                                            return this._renderUndoLi(eachList, index);
                                         })
                                     }
                                 </CSSTransitionGroup>

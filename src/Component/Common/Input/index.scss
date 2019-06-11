@@ -10,12 +10,12 @@
     input {
         width: 100%;
         height: 32px;
-        padding: 4px;
+        padding: 4px 20px 4px 4px;
         border: none;
         border-bottom: 1px solid rgba(255, 255, 255, 0.8);
-        color: #aaa;
+        color: #ccc;
         font-size: 16px;
-        letter-spacing: 4px;
+        letter-spacing: 2px;
         background: transparent;
         outline: none;
         opacity: .1;
@@ -40,5 +40,16 @@
         .close-btn {
             opacity: 0;
         }
+    }
+}
+
+.input-li.undo-li {
+    position: absolute;
+    bottom: 50px;
+    left: 20px;
+    color: rgba(255, 255, 255, .2);
+    list-style: none;
+    > * {
+        color: rgba(255, 255, 255, .2);
     }
 }

@@ -53,7 +53,7 @@ class App extends PureComponent {
     state = {
         [STORE_TODO_KEY]: [], // 未完成的消息
         [STORE_DONE_KEY]: [], // 已经完成的消息
-        focus: '', // input是否focus
+        focus: false, // input是否focus
         category: CATEGORY_LIST, // 总分类
         categoryKey: INIT_CATEGORY_KEY, // 当前激活的分类
         openTool: false, // 打开工具栏
@@ -123,6 +123,11 @@ class App extends PureComponent {
      * 对列表进行相关的数据操作 Start
      */
     insertOneData = (data, storeKey, isEnter) => {
+        if(!data || data.value === '') {
+            Tip.showTip('输入不可为空');
+            return false;
+        }
+
         const {categoryKey} = this.state;
         const preData = this.state[storeKey];
 
@@ -302,8 +307,9 @@ class App extends PureComponent {
         const {focus, category, categoryKey, openTool, enableAnimate, todoEnterAnimate} = this.state;
         const todoData = this.state[STORE_TODO_KEY];
         const doneData = this.state[STORE_DONE_KEY];
+        const isSmall = document.querySelector('body').clientWidth <= 310;
         return (
-            <div id="todo-app" tabIndex="0">
+            <div id="todo-app" className={cs({'is-small': isSmall})} tabIndex="0">
                 <div className={cs('app-wrapper', {'open-tool': openTool})}>
 
                     {/* 分类 */}
@@ -341,7 +347,7 @@ class App extends PureComponent {
                             checked small
                             list={doneData}
                             enterActive={ANIMATE.INSERT_DONE}
-                            transitionEnter={enableAnimate}
+                            transitionEnter={false}
                             transitionLeave={false}
                             onSelect={this.toggleOneData}
                             onDelete={this.deleteOneData}/>
@@ -349,7 +355,7 @@ class App extends PureComponent {
 
                     {/* 输入框 */}
                     <Input
-                        className={cs({"focus": focus})}
+                        focus={!!focus}
                         max={LIMIT_WORDS}
                         onFocus={this.handleInputFocus}
                         onBlur={this.handleInputBlur}

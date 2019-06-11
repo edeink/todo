@@ -14,8 +14,8 @@ function createWindow() {
 
     // Create the browser window.
     win = new BrowserWindow({
-        width: 320,
-        height: 310,
+        width: 310,
+        height: 300,
         title: '大哥大嫂过年好！',
         resizable: false,
         transparent: true,

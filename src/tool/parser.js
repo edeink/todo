@@ -63,9 +63,11 @@ const pauseSymbol = ['[', ']', '>', '`', '*', '~'];
 
 const parser = {
     // 将用户输入解析为Todo识别的数据
-    parse(txt) {
+    parse(txt, closeTips) {
         if (typeof txt !== 'string' || txt.length === 0) {
-            console.log('输入的数据有误，请确保输入源为非空字符串');
+            if (closeTips !== true) {
+                console.log('输入的数据有误，请确保输入源为非空字符串');
+            }
             return false;
         }
         txt = txt.trim();
@@ -80,7 +82,9 @@ const parser = {
                 let nextOffset = result.end + 1;
                 if (nextOffset <= offset) {
                     offset = offset + 1;
-                    console.log(`解析错误: ${txt}, ${offset}`)
+                    if (closeTips !== true) {
+                        console.log(`解析错误: ${txt}, ${offset}`)
+                    }
                 } else {
                     // 处理正常文字流
                     if (startTextIndex !== -1) {
@@ -105,8 +109,10 @@ const parser = {
         }
         // 默认完整的解析在第一个结构中
         collection[0][TODO_CONFIG.RENDER_STRING_KEY] = explain.getMessage(collection);
-        // console.log(`执行解析数据: ${txt}`);
-        console.log(`txt: ${txt}, parseData:`, collection);
+        if(closeTips !== true) {
+            // console.log(`执行解析数据: ${txt}`);
+            console.log(`txt: ${txt}, parseData:`, collection);
+        }
         return collection;
     },
     analyze(txt, offset) {
@@ -413,7 +419,7 @@ const parser = {
             // // 分类
             // ' [hahah, lalala] 正常的分类输入',
             // '[ 错误的分类输入',
-            // '[只有分类]',
+            '[只有分类]',
             // '巴拉巴拉 [出现在中间, 的分类] 分类解析不解析', // 应该解析
 
             // // 超链接
@@ -437,7 +443,7 @@ const parser = {
             // '~~aaa~~ 你好啊',
 
             // // 完整的功能
-            '>2d 13:20 [A, B] 所有的[格式](www.baidu.com)*能***否*****正***`常`~~展~~示？',
+            // '>2d 13:20 [A, B] 所有的[格式](www.baidu.com)*能***否*****正***`常`~~展~~示？',
 
             // // 其他错误的发现
             // '0>2d 13:20 [A, B] 所有的[格式](www.baidu.com) *能* **否** ***正*** `常` ~~展~~ 示？0'

@@ -10,14 +10,14 @@ export default class Tags extends PureComponent {
 
     render() {
         const {data} = this.props.data;
-        if(!data || data.length === 0) {
+        if(!data || !Array(data.tags) || data.tags.length === 0) {
             return null;
         }
         return (
             <span className='tags'>
                 {
-                    data.map(function (eachData) {
-                        return <span className='tag' key={eachData}>{eachData}</span>
+                    data.tags.map(function (eachTag) {
+                        return <span className='tag' key={eachTag}>{eachTag}</span>
                     })
                 }
             </span>

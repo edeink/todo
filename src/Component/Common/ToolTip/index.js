@@ -22,6 +22,11 @@ const getAnchor = () => {
     }
 };
 
+const DIRECTION = {
+    TOP: 'top',
+    Bottom: 'bottom',
+}
+
 class ToolTipContent extends PureComponent {
     static propTypes = {
         x: PropTypes.number.isRequired,
@@ -66,12 +71,16 @@ class ToolTipContent extends PureComponent {
 export default class ToolTip extends PureComponent {
     static propTypes = {
         title: PropTypes.string.isRequired,
+        direction: PropTypes.oneOf(Object.values(DIRECTION)),
         children: PropTypes.object,
     };
 
     handleMouseEnter = (e) => {
         const {pageX: x, pageY: y, currentTarget: target} = e;
         const {title} = this.props;
+        if(!title || title === '') {
+            return false;
+        }
         if (!popup) {
             popup = createContainer();
         }
