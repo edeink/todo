@@ -7,6 +7,7 @@
   "homepage": "./",
   "main": "./public/electron.js",
   "dependencies": {
+    "animate.css": "^3.7.2",
     "classnames": "^2.2.6",
     "cross-env": "^5.2.0",
     "fast-json-stringify": "^1.15.3",
@@ -23,19 +24,20 @@
   },
   "scripts": {
     "start": "react-scripts start",
-    "build": "react-scripts build",
+    "build": "cross-env INLINE_RUNTIME_CHUNK=false react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject",
     "clear": "cross-env rm -rf build && rm -rf dist ",
     "start-app": "cross-env NODE_ENV=development electron .",
     "pack": "electron-builder --dir",
     "dist": "electron-builder",
+    "build-app": "yarn clear && yarn build && yarn dist",
     "postinstall": "electron-builder install-app-deps"
   },
   "build": {
     "mac": {
       "category": "public.app-category.developer-tools",
-      "icon": "build/icon.icns"
+      "icon": "favicon.ico"
     },
     "files": [
       {

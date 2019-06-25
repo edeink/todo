@@ -95,7 +95,7 @@ export default class ToolTip extends PureComponent {
     };
 
     handleMouseLeave = (e) => {
-        if (popup) {
+        if (popup && appendAnchor) {
             ReactDOM.unmountComponentAtNode(popup);
             appendAnchor.removeChild(popup);
         }

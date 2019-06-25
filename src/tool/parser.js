@@ -1,4 +1,5 @@
 import TODO_CONFIG from '../config';
+import PARSER_TEST from './parser_test';
 
 const TOKEN_TYPE = {
     TIME: 'time',
@@ -391,6 +392,7 @@ const parser = {
             if (txt[1] === ' ') {
                 return;
             }
+            let timeStamp = explain.getTimeStamp(delay);
             return {
                 begin: offset,
                 end: firIndex + offset,
@@ -398,57 +400,14 @@ const parser = {
                 key: TOKEN_TYPE.TIME,
                 data: {
                     delay,
+                    timeStamp,
                 }
             }
         }
 
     },
     test() {
-        const testData = [
-            // // 时间
-            // '>2d 13:20 常规的时间',
-            // '>1s 推迟一秒',
-            // '> 15:30 没有推迟时间的时间输入',
-            // '> 错误的时间输入',
-            // '>ew 15:20 ', // ew会被解析成时间，15:20会被解析成文本
-            // '>ew 15:20 后面有字',
-            // '巴拉巴拉 >2d 24:30 时间解析不解析', // 应该解析
-            // '>2d 13 半个时间',
-            // '> 周六 中文的时间',
-
-            // // 分类
-            // ' [hahah, lalala] 正常的分类输入',
-            // '[ 错误的分类输入',
-            '[只有分类]',
-            // '巴拉巴拉 [出现在中间, 的分类] 分类解析不解析', // 应该解析
-
-            // // 超链接
-            // '我跟你讲，[baidu](https://www.baidu.com)真的很好用',
-            // '假如[分类][链接](https://www.baidu.com)同时存在',
-
-            // // 代码
-            // '代码`console.log("aa")`部分',
-            // '这种情况``应该解析为纯文本',
-
-            // // 强调
-            // '* italic *文本',
-            // '**em ** 强调',
-            // '*** italic&em ***强调和意大利',
-            // '**fa*', // 应该被解析成Italic，
-            // '***fa*', // 应该被解析成Italic
-            // '***fa**', // 应该被解析成em
-            // '****fa***', // 应该被解析成Italic & em
-
-            // // 删除线
-            // '~~aaa~~ 你好啊',
-
-            // // 完整的功能
-            // '>2d 13:20 [A, B] 所有的[格式](www.baidu.com)*能***否*****正***`常`~~展~~示？',
-
-            // // 其他错误的发现
-            // '0>2d 13:20 [A, B] 所有的[格式](www.baidu.com) *能* **否** ***正*** `常` ~~展~~ 示？0'
-        ];
-        testData.forEach(function (eachData) {
+        PARSER_TEST.forEach(function (eachData) {
             parser.parse(eachData);
         });
     }
@@ -458,6 +417,7 @@ const TIME_UNIT = {
     MINUTE: 'm',
     HOURS: 'h',
     DAY: 'd',
+    SECOND: 's',
 };
 
 const TIME_UNIT_ARRAY = Object.values(TIME_UNIT);
@@ -470,7 +430,7 @@ const explain = {
         let date = now.getDate();
         let hour = now.getHours();
         let minutes = now.getMinutes();
-        let second = 0;
+        let second = now.getSeconds();
         // 分析delay
         if (delay) {
             let unit = delay[delay.length - 1];
@@ -482,6 +442,10 @@ const explain = {
                 value = parseInt(delay.substring(0, delay.length - 1));
             }
             switch (unit) {
+                case TIME_UNIT.SECOND: {
+                    second += value;
+                    break;
+                }
                 case TIME_UNIT.MINUTE: {
                     minutes += value;
                     break;

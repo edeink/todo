@@ -78,14 +78,15 @@ export default class UndoList extends Component {
         return (
             <UndoLi
                 listData={eachList}
-                key={index}
+                key={eachList.value}
                 index={index}
                 small={small}
                 checked={checked}
                 storeKey={storeKey}
                 onSelect={onSelect}
                 onDelete={onDelete}
-                onDrag={onDrag}/>
+                onDrag={onDrag}
+                onActive={this.onActive}/>
         )
     }
 

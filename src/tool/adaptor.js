@@ -17,8 +17,9 @@ function getOSType(){
 
 // 通知
 const notify = (title, body) => {
+    console.log('通知：', title, body);
     new Notification(title, {
-        body
+        body,
     });
 };
 

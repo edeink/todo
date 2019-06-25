@@ -4,7 +4,7 @@ import cs from 'classnames';
 import Category from './Component/Exclusive/Category';
 import Tip from './Component/Exclusive/Tip';
 import Status from './Component/Exclusive/Status';
-import Input from './Component/Common/Input';
+import Input from './Component/Exclusive/Input';
 import UndoList from './Component/Exclusive/UndoList';
 import Tool, {ToolBtn} from './Component/Exclusive/Tool';
 import Uploader, {ACCEPT_TYPE} from "./Component/Common/Uploader";

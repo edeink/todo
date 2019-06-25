@@ -37,10 +37,11 @@ export default class UndoLi extends PureComponent {
         onSelect: PropTypes.func,
         onDelete: PropTypes.func,
         onDrag: PropTypes.func,
+        onActive: PropTypes.func,
     };
 
     _renderLi = () => {
-        const {listData, index, checked} = this.props;
+        const {listData, index, checked, onActive} = this.props;
         let collect = listData[RENDER_PARSE_KEY];
         let isActive = listData[RENDER_ACTIVE_KEY];
         return (
@@ -50,7 +51,7 @@ export default class UndoLi extends PureComponent {
                         let key = eachData.begin + eachData.content;
                         switch (eachData.key) {
                             case TOKEN_TYPE.TIME:
-                                return <Time key={key} index={index} onActive={this.onActive}
+                                return <Time key={key} index={index} onActive={onActive}
                                              data={eachData} disabled={checked}/>;
                             case TOKEN_TYPE.TAG:
                                 return <Tags key={key} data={eachData}/>;

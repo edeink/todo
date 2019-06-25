@@ -4,7 +4,9 @@ import PropTypes from 'prop-types';
 
 import ToolTip from '../../Common/ToolTip';
 
+import TODO_CONFIG from '../../../config'
 import {notify} from "../../../tool/adaptor";
+
 import './index.scss';
 
 export default class Time extends Component {
@@ -17,19 +19,17 @@ export default class Time extends Component {
 
     componentDidMount() {
         const {data, disabled, onActive} = this.props;
-        if (data && onActive) {
-            if (disabled !== true) {
-                const {data: timeData} = data;
-                let now = Date.now();
-                let timeStamp = timeData.timeStamp;
-                let diff = timeStamp - now;
-                if (diff  <= 0) {
+        if (data && onActive && !disabled) {
+            const {data: timeData} = data;
+            let now = Date.now();
+            let timeStamp = timeData.timeStamp;
+            let diff = timeStamp - now;
+            if (diff  <= 0) {
+                this.notify();
+            } else {
+                this.timeoutKey = setTimeout(() => {
                     this.notify();
-                } else {
-                    this.timeoutKey = setTimeout(() => {
-                        this.notify();
-                    }, diff);
-                }
+                }, diff);
             }
         }
     }
@@ -41,8 +41,8 @@ export default class Time extends Component {
     }
 
     notify() {
-        const {index, onActive} = this.props;
-        notify('[TODO]提醒');
+        const {index, data, onActive} = this.props;
+        notify('亲，你还有事件没做哦', data[TODO_CONFIG.RENDER_STRING_KEY]);
         onActive(index);
     }
 

@@ -47,9 +47,15 @@
     position: absolute;
     bottom: 50px;
     left: 20px;
+    right: 20px;
     color: rgba(255, 255, 255, .2);
     list-style: none;
-    > * {
-        color: rgba(255, 255, 255, .2);
+    .hyperlink button {
+        color: rgba(255, 255, 255, .3);
+        border-bottom: 1px solid rgba(255, 255, 255, .3);
+        &:hover {
+            color: rgba(255, 255, 255, .4);
+            border-bottom: 1px solid rgba(255, 255, 255, .4)
+        }
     }
 }

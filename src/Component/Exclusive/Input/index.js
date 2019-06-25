@@ -2,12 +2,12 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import cs from 'classnames';
 
-import CloseBtn from '../CloseBtn/index';
-import Tip from '../../Exclusive/Tip/index';
-import UndoLi from "../../Exclusive/UndoList/UndoLi";
+import CloseBtn from '../../Common/CloseBtn/index';
+import Tip from '../Tip/index';
+import UndoLi from "../UndoList/UndoLi";
 
 import parser from "../../../tool/parser";
-import TODO_CONFIG from "../../../config";
+import TODO_CONFIG from "../../../config/index";
 import KEYCODE from '../../../tool/keycode';
 
 import './index.scss';
@@ -73,7 +73,7 @@ export default class Input extends PureComponent {
         return (
             <React.Fragment>
                 {
-                    parseData &&
+                    (parseData && parseData.length >= 2) &&
                     <UndoLi className="input-li" listData={renderData}/>
                 }
                 <div className={cs("input-wrapper", className, {'empty': empty, 'focus': focus})}>
