@@ -88,6 +88,7 @@ class App extends PureComponent {
     _readData = (callback) => {
         console.time(TIME_KEY.ALL_DATA_READ_AND_RENDER);
         const category = parse(store.getItem(STORE_CATEGORY_KEY), CATEGORY_LIST);
+        store.setItem(STORE_CATEGORY_KEY, JSON.stringify(category));
         const categoryKey = category[0].key;
         console.time(TIME_KEY.ALL_LIST_READ_AND_RENDER);
         this._readList(callback);
@@ -361,6 +362,7 @@ class App extends PureComponent {
                         onBlur={this.handleInputBlur}
                         onEnter={this.handleInputEnter}/>
                 </div>
+                {/* 工具栏 */}
                 <Tool isActive={openTool} onClose={this.handleToggleTool}>
                     <ToolTip title="导出配置">
                         <ToolBtn type='download' onClick={this.handleSave}/>

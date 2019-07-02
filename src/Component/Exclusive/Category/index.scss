@@ -2,30 +2,35 @@
     position: absolute;
     top: 0;
     bottom: 0;
-    right: 0px;
+    right: 0;
     margin: auto 0;
     height: 180px;
-    overflow-x: hidden;
-    overflow-y: auto;
+    overflow: visible;
     opacity: .4;
     transition: opacity .3s ease-in-out;
     ul {
+        width: 40px;
         padding: 0;
+        overflow: visible;
         li {
-            position: relative;
-            right: -4px;
+            float: right;
             padding: 2px 6px 2px 4px;
-            margin-right: 0;
-            margin-top: 2px;
+            margin: 2px;
             color: #ccc;
             font-size: 12px;
             border-radius: 2px 0 0 2px;
             cursor: pointer;
             transition: right ease-in-out .3s;
+            text-overflow: ellipsis;
+            overflow: hidden;
+            white-space: nowrap;
             &.is-active  {
-                right: 0px;
+                right: 0;
                 color: #eee;
-                background: rgba(255, 255, 255, .15);
+                background: rgba(255, 255, 255, .2);
+            }
+            &.is-focus {
+                max-width: 200px;
             }
             &:hover {
                 background: rgba(255, 255, 255, .3);
@@ -34,5 +39,16 @@
     }
     &:hover {
         opacity: 1;
+    }
+    .category-input {
+        padding: 4px 6px;
+        border: none;
+        background: rgba(255, 255, 255, .6);
+        outline: none;
+    }
+    .add-category {
+        right: 0;
+        padding: 2px;
+        list-style: none;
     }
 }
