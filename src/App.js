@@ -8,6 +8,7 @@ import Input from './Component/Exclusive/Input';
 import UndoList from './Component/Exclusive/UndoList';
 import Tool, {ToolBtn} from './Component/Exclusive/Tool';
 import Uploader, {ACCEPT_TYPE} from "./Component/Common/Uploader";
+import ColorTheme from './Component/Exclusive/ColorTheme';
 import ToolTip from './Component/Common/ToolTip';
 
 import TODO_CONFIG from './config';
@@ -59,12 +60,11 @@ class App extends PureComponent {
         openTool: false, // 打开工具栏
         enableAnimate: false, // 禁用动画
         todoEnterAnimate: '',
+        theme: ColorTheme.getTheme(), // THEME.DEFAULT,
     };
 
     componentDidMount() {
-        this._readData(() => {
-            this.brieflyCloseAnimate();
-        });
+        this._readData().then(this.brieflyCloseAnimate);
     }
 
     __testRender() {
@@ -85,39 +85,45 @@ class App extends PureComponent {
     }
 
     // 从持久化中读取数据
-    _readData = (callback) => {
-        console.time(TIME_KEY.ALL_DATA_READ_AND_RENDER);
-        const category = parse(store.getItem(STORE_CATEGORY_KEY), CATEGORY_LIST);
-        store.setItem(STORE_CATEGORY_KEY, JSON.stringify(category));
-        const categoryKey = category[0].key;
-        console.time(TIME_KEY.ALL_LIST_READ_AND_RENDER);
-        this._readList(callback);
-        this.setState({
-            category,
-            categoryKey,
-            openTool: false,
-        }, () => {
-            console.timeEnd(TIME_KEY.ALL_DATA_READ_AND_RENDER);
-            console.timeEnd(TIME_KEY.ALL_LIST_READ_AND_RENDER);
+    _readData = () => {
+        return new Promise((resolve) => {
+            console.time(TIME_KEY.ALL_DATA_READ_AND_RENDER);
+            const category = parse(store.getItem(STORE_CATEGORY_KEY), CATEGORY_LIST);
+            store.setItem(STORE_CATEGORY_KEY, JSON.stringify(category));
+            const categoryKey = category[0].key;
+            console.time(TIME_KEY.ALL_LIST_READ_AND_RENDER);
+            this.setState({
+                category,
+                categoryKey,
+                openTool: false,
+            }, () => {
+                this._readList().then(() => {
+                    resolve();
+                    console.timeEnd(TIME_KEY.ALL_DATA_READ_AND_RENDER);
+                    console.timeEnd(TIME_KEY.ALL_LIST_READ_AND_RENDER);
+                });
+            });
         });
     };
     // 读取每列数据
-    _readList = (callback) => {
-        const {categoryKey} = this.state;
-        LIST_KEYS.forEach((eachKey) => {
-            const storeKey = getRealStoreKey(categoryKey, eachKey);
-            const tempData = parse(store.getItem(storeKey), []);
-            tempData.forEach(function (eachData) {
-                if (!eachData[RENDER_PARSE_KEY]) {
-                    eachData[RENDER_PARSE_KEY] = parser.parse(eachData.value);
-                    eachData[RENDER_STRING_KEY] = eachData[RENDER_PARSE_KEY][0][RENDER_STRING_KEY];
-                }
+    _readList = () => {
+        return new Promise((resolve) => {
+            const {categoryKey} = this.state;
+            LIST_KEYS.forEach((eachKey) => {
+                const storeKey = getRealStoreKey(categoryKey, eachKey);
+                const tempData = parse(store.getItem(storeKey), []);
+                tempData.forEach(function (eachData) {
+                    if (!eachData[RENDER_PARSE_KEY]) {
+                        eachData[RENDER_PARSE_KEY] = parser.parse(eachData.value);
+                        eachData[RENDER_STRING_KEY] = eachData[RENDER_PARSE_KEY][0][RENDER_STRING_KEY];
+                    }
+                });
+                this.setState({
+                    [eachKey]: tempData
+                });
             });
-            this.setState({
-                [eachKey]: tempData
-            });
+            resolve();
         });
-        callback && callback();
     };
 
     /**
@@ -278,7 +284,7 @@ class App extends PureComponent {
         keys.forEach(function (eachKey) {
             store.setItem(eachKey, stringify(data[eachKey]));
         });
-        this._readData(function () {
+        this._readData().then(function () {
             Tip.showTip('读取成功')
         });
     };
@@ -299,18 +305,23 @@ class App extends PureComponent {
             openTool: !openTool
         })
     };
+    handleThemeChange = (theme) => {
+        this.setState({
+            theme
+        });
+    };
 
     /**
      * 前端交互事件 END
      */
 
     render() {
-        const {focus, category, categoryKey, openTool, enableAnimate, todoEnterAnimate} = this.state;
+        const {focus, category, categoryKey, openTool, enableAnimate, todoEnterAnimate, theme} = this.state;
         const todoData = this.state[STORE_TODO_KEY];
         const doneData = this.state[STORE_DONE_KEY];
         const isSmall = document.querySelector('body').clientWidth <= 310;
         return (
-            <div id="todo-app" className={cs({'is-small': isSmall})} tabIndex="0">
+            <div id="todo-app" className={cs(`theme-${theme}`, {'is-small': isSmall})} tabIndex="0">
                 <div className={cs('app-wrapper', {'open-tool': openTool})}>
 
                     {/* 分类 */}
@@ -372,6 +383,7 @@ class App extends PureComponent {
                             <ToolBtn type='upload'/>
                         </Uploader>
                     </ToolTip>
+                    <ColorTheme onChange={this.handleThemeChange}/>
                 </Tool>
             </div>
         );

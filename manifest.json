@@ -2,11 +2,6 @@
     "manifest_version": 2,
     "name": "小便签",
     "version": "0.0.3",
-    "background": {
-        "scripts": [
-            "./extension/background.js"
-        ]
-    },
     "browser_action": {
         "default_icon": "./extension/favicon.png",
         "default_title": "小便签Chrome插件",
