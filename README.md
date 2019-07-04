@@ -21,10 +21,13 @@
 yarn # install deps 安装依赖
 
 yarn start # web页面调试
-yarn start-app # electron页面调试(先执行yarn start)
+yarn start-app # electron页面调试
 
-yarn clear && yarn build # 生成chrome插件
-yarn dist # 生成electron应用(先运行yarn clear && yarn build)
+yarn clear # 清除旧代码
+yarn build # 生成chrome插件
+yarn dist # 生成electron应用
+
+yarn deploy # 发布github pages
 ```
 
 ## 功能
@@ -54,17 +57,17 @@ yarn dist # 生成electron应用(先运行yarn clear && yarn build)
 	- [x] 系统托盘
 	- [ ] 图标
 - [x] 显示
-    - [x] 主题色：**黑色** | **白色 **主题
+    - [x] 主题色：**黑色** | **白色** 主题
     - [x] 语法
       - [x] 自定义语法
-        - 时间：`>7day 13:10 `
+            - 时间：`>7day 13:10 `
             - 标签：`[A, B]`
           - [x] 行级Markdown语法
-        - 超链接：`[baidu](https://www.baidu.com)`
+            - 超链接：`[baidu](https://www.baidu.com)`
             - 强调：`*xxx*`、`**xxx**`、`***xxx***`
             - 修饰：\``code`\`、`~~delete~~`
     - [ ] 行级富文本编辑器
-      - [ ] 输入时高亮
+      - 输入时高亮
 - [ ] 发布
     - [ ] 自动更新
     - [ ] Github Release
