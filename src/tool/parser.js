@@ -370,7 +370,7 @@ const parser = {
         txt = txt.substr(offset);
         let firIndex = txt.indexOf(' ');
         let secIndex = txt.indexOf(' ', firIndex + 1);
-        let delay = txt.substring(offset + 1, firIndex); // 推迟的时间
+        let delay = txt.substring(1, firIndex); // 推迟的时间
 
         if (secIndex !== -1) {
             let clock = txt.substring(firIndex + 1, secIndex); // 选中的时间
@@ -431,13 +431,29 @@ const explain = {
         let hour = now.getHours();
         let minutes = now.getMinutes();
         let second = now.getSeconds();
+        let preSecond = second;
+
+        // 冗余处理，处理 >14:30这种情况
+        if (delay.indexOf(':') !== -1) {
+            clock = delay;
+            delay = null;
+        }
+
         // 分析delay
         if (delay) {
             let unit = delay[delay.length - 1];
             let value = null;
             if (TIME_UNIT_ARRAY.indexOf(unit) === -1) {
-                unit = TIME_UNIT.DAY;
-                value = delay;
+                let day = explain.getChineseDay(delay);
+                if (Number.isInteger(day)) {
+                    let currDay = now.getDay();
+                    let diffDay = day - currDay;
+                    diffDay = diffDay < 0 ? diffDay + 7 : diffDay;
+                    date += diffDay;
+                } else {
+                    unit = TIME_UNIT.DAY;
+                    value = delay;
+                }
             } else {
                 value = parseInt(delay.substring(0, delay.length - 1));
             }
@@ -463,11 +479,49 @@ const explain = {
         // 分析时间
         if (clock) {
             let clockArray = clock.split(':');
-            hour = clockArray[0];
-            minutes = clockArray[1];
+            if (clockArray.length === 1) {
+                if (Number.isInteger(clockArray[0])) {
+                    hour = clockArray[0];
+                } else {
+                    let day = explain.getChineseDay(clockArray[0]);
+                    if (Number.isInteger(day)) {
+                        let currDay = now.getDay();
+                        let diffDay = day - currDay;
+                        diffDay = diffDay < 0 ? diffDay + 7 : diffDay;
+                        date += diffDay;
+                    }
+                }
+            } else {
+                hour = clockArray[0];
+                minutes = clockArray[1];
+            }
         }
+
         let newDate = new Date(year, month, date, hour, minutes, second);
-        return newDate.getTime();
+        let time = newDate.getTime();
+        if (Number.isNaN(time)) {
+        }
+        return time;
+    },
+    getChineseDay(clock) {
+        switch(clock) {
+            case '星期一':
+            case '周一': return 1;
+            case '星期二':
+            case '周二': return 2;
+            case '星期三':
+            case '周三': return 3;
+            case '星期四':
+            case '周四': return 4;
+            case '星期五':
+            case '周五': return 5;
+            case '星期六':
+            case '周六': return 6;
+            case '星期天':
+            case '周日': return 7;
+            default:
+                return undefined;
+        }
     },
     getMessage(collection) {
         let str = '';

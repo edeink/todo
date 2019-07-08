@@ -46,9 +46,6 @@ export default class Tip extends PureComponent {
             if (length === 0) {
                 return {tip: '哈哈哈，小哑巴！'};
             }
-            if (message.length >= 9) {
-                return {tip: '装不下啦，快去干活！'};
-            }
         }
         if (findIndex !== -1) {
             return {

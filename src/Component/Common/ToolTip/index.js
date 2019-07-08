@@ -17,7 +17,7 @@ const getAnchor = () => {
     if (appendAnchor) {
         return appendAnchor;
     } else {
-        appendAnchor = document.querySelector('body');
+        appendAnchor = document.querySelector('#root');
         return appendAnchor;
     }
 };
@@ -46,12 +46,21 @@ class ToolTipContent extends PureComponent {
 
     adjustUI = () => {
         const {y, target} = this.props;
-        const {clientWidth} = this.refContent;
+        const {clientWidth, clientHeight} = this.refContent;
         const width = parseInt(clientWidth);
+        const height = parseInt(clientHeight);
         const rect = target.getBoundingClientRect();
         let margin = 10;
-        let left =  (rect.left + rect.width / 2) - width / 2;
+        let left =  rect.left + rect.width / 2 - width / 2;
         let top =  Math.max(y + margin, rect.bottom + margin);
+        let anchor = getAnchor();
+        if (left + width > anchor.clientWidth) {
+            left = (rect.left - rect.width / 2) - width;
+            top = rect.top - height / 2 + rect.height / 2;
+        }
+        if (top + height > anchor.clientHeight) {
+            top = rect.top - rect.height / 2 - height;
+        }
         this.setState({
             left, top
         })
@@ -95,7 +104,7 @@ export default class ToolTip extends PureComponent {
     };
 
     handleMouseLeave = (e) => {
-        if (popup && appendAnchor) {
+        if (popup && popup.isConnected && appendAnchor) {
             ReactDOM.unmountComponentAtNode(popup);
             appendAnchor.removeChild(popup);
         }

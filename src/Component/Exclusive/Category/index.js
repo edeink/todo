@@ -78,7 +78,7 @@ export default class Category extends PureComponent {
         // 没有输入内容
         let modifyCategory = options[focusIndex];
         if (!focusValue) {
-            if (modifyCategory.isNew === true) {
+            if (modifyCategory && modifyCategory.isNew === true) {
                this.deleteOption(focusIndex);
             }
             return false;
@@ -99,7 +99,7 @@ export default class Category extends PureComponent {
         }
         options[focusIndex] = modifyCategory;
         store.setItem(STORE_CATEGORY_KEY, JSON.stringify(options));
-        this.props.onChange(key);
+        this.props.onChange(modifyCategory.key);
     };
 
     onValueChange = (event) => {
@@ -138,7 +138,7 @@ export default class Category extends PureComponent {
                                onBlur={() => {this.onBlur(key)}}
                                onKeyPress={this.onKeyDown}
                                onChange={this.onValueChange}/> :
-                        <span>{value}</span>
+                        <ToolTip title={value}><span>{value}</span></ToolTip>
                 }
                 </li>
         )

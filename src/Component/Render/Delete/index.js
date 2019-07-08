@@ -11,7 +11,7 @@ export default class Delete extends PureComponent {
     render() {
         const {data} = this.props.data;
         return (
-            <span className='delete'>{data}</span>
+            <span className='delete'>{data.value}</span>
         )
     }
 }

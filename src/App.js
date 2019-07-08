@@ -28,8 +28,8 @@ const ANIMATE = {
 
 // 从配置中读取信息
 const {
-    CATEGORY_LIST, LIMIT_WORDS,
-    STORE_TODO_KEY, STORE_DONE_KEY, STORE_CATEGORY_KEY,
+    CATEGORY_LIST, LIMIT_WORDS, STORE_TODO_KEY,
+    STORE_DONE_KEY, STORE_CATEGORY_KEY, STORE_ACTIVE_CATEGORY_KEY,
     RENDER_ACTIVE_KEY, RENDER_PARSE_KEY, RENDER_STRING_KEY
 } = TODO_CONFIG;
 const LIST_KEYS = [STORE_TODO_KEY, STORE_DONE_KEY];
@@ -90,7 +90,7 @@ class App extends PureComponent {
             console.time(TIME_KEY.ALL_DATA_READ_AND_RENDER);
             const category = parse(store.getItem(STORE_CATEGORY_KEY), CATEGORY_LIST);
             store.setItem(STORE_CATEGORY_KEY, JSON.stringify(category));
-            const categoryKey = category[0].key;
+            const categoryKey = store.getItem(STORE_ACTIVE_CATEGORY_KEY) || category[0].key;
             console.time(TIME_KEY.ALL_LIST_READ_AND_RENDER);
             this.setState({
                 category,
@@ -258,6 +258,7 @@ class App extends PureComponent {
         this.setState({
             categoryKey: key,
         }, () => {
+            store.setItem(STORE_ACTIVE_CATEGORY_KEY, key);
             this._readList();
             this.brieflyCloseAnimate();
         });
@@ -323,11 +324,6 @@ class App extends PureComponent {
         return (
             <div id="todo-app" className={cs(`theme-${theme}`, {'is-small': isSmall})} tabIndex="0">
                 <div className={cs('app-wrapper', {'open-tool': openTool})}>
-
-                    {/* 分类 */}
-                    <Category activeKey={categoryKey}
-                              options={category}
-                              onChange={this.changeCategory}/>
                     {/* 其它提示 */}
                     <Tip/>
                     {/* 当前状态栏 */}
@@ -364,7 +360,10 @@ class App extends PureComponent {
                             onSelect={this.toggleOneData}
                             onDelete={this.deleteOneData}/>
                     </div>
-
+                    {/* 分类 */}
+                    <Category activeKey={categoryKey}
+                              options={category}
+                              onChange={this.changeCategory}/>
                     {/* 输入框 */}
                     <Input
                         focus={!!focus}

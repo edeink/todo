@@ -33,7 +33,6 @@
                 background: rgba(255, 255, 255, .2);
             }
             &.is-focus {
-                padding: 0;
                 max-width: 200px;
                 background: rgba(255, 255, 255, 0);
             }
@@ -44,9 +43,11 @@
     }
     .category-input {
         padding: 4px 6px;
-        border: none;
-        background: rgba(255, 255, 255, .6);
+        border: 1px solid rgba(255, 255, 255, .7);
+        border-radius: 2px;
+        background: rgba(255, 255, 255, .9);
         outline: none;
+        z-index: 2;
     }
     .add-category {
         right: 0;

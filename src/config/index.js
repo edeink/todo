@@ -10,6 +10,7 @@ const TODO_CONFIG = {
     ],
     // 存储层次的key
     STORE_CATEGORY_KEY: '__category',
+    STORE_ACTIVE_CATEGORY_KEY: '__active_category',
     STORE_TODO_KEY: '__todoList',
     STORE_DONE_KEY: '__doneList',
     // 显示层次的key

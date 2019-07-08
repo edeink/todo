@@ -1,0 +1,19 @@
+{
+    "manifest_version": 2,
+    "name": "小便签",
+    "description": "一款简单的任务列表（Todo）插件",
+    "version": "0.0.3",
+    "icons": {
+        "16": "./img/icon16.png",
+        "32": "./img/icon32.png",
+        "48": "./img/icon48.png",
+        "128": "./img/icon128.png"
+    },
+    "browser_action": {
+        "default_icon": "./img/icon48.png",
+        "default_title": "小便签Chrome插件",
+        "default_popup": "./index.html"
+    },
+    "permissions": [],
+    "content_security_policy": "script-src 'self' 'unsafe-eval'; object-src 'self'"
+}

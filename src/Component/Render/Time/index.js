@@ -46,9 +46,14 @@ export default class Time extends Component {
         onActive(index);
     }
 
+    formatTime(date) {
+        return date.toLocaleString();
+    }
+
     render() {
         const {data} = this.props.data;
-        let nextTime = new Date(data.timeStamp).toLocaleString();
+        let nextDate = new Date();
+        let nextTime = this.formatTime(nextDate);
         return (
             <span className='time'>
                 <ToolTip title={nextTime}>
