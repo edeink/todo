@@ -60,15 +60,15 @@ yarn deploy # 发布github pages
 	- [x] 主题色：**黑色** | **白色** 主题
 	- [x] 语法
 		- [x] 自定义语法
-		- 时间：`>7day 13:10 `
-		- 标签：`[A, B]`
-	- [x] 行级Markdown语法
-		- 超链接：`[baidu](https://www.baidu.com)`
-		- 强调：`*xxx*`、`**xxx**`、`***xxx***`
-		- 修饰：\``code`\`、`~~delete~~`
-	- [ ] 行级富文本编辑器
-		- 输入时高亮
-    
+            - 时间：`>7day 13:10 `
+            - 标签：`[A, B]`
+        - [x] 行级Markdown语法
+            - 超链接：`[baidu](https://www.baidu.com)`
+            - 强调：`*xxx*`、`**xxx**`、`***xxx***`
+            - 修饰：\``code`\`、`~~delete~~`
+        - [ ] 行级富文本编辑器
+            - 输入时高亮
 - [ ] 发布
     - [ ] 自动更新
+    - [ ] 持续集成
     - [ ] Github Release

@@ -431,7 +431,6 @@ const explain = {
         let hour = now.getHours();
         let minutes = now.getMinutes();
         let second = now.getSeconds();
-        let preSecond = second;
 
         // 冗余处理，处理 >14:30这种情况
         if (delay.indexOf(':') !== -1) {

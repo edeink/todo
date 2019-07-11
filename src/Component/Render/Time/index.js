@@ -52,8 +52,7 @@ export default class Time extends Component {
 
     render() {
         const {data} = this.props.data;
-        let nextDate = new Date();
-        let nextTime = this.formatTime(nextDate);
+        let nextTime = this.formatTime(data);
         return (
             <span className='time'>
                 <ToolTip title={nextTime}>

@@ -1,6 +1,6 @@
 import React, {PureComponent} from 'react';
 import cs from 'classnames';
-
+import {DragDropContext} from "react-beautiful-dnd";
 import Category from './Component/Exclusive/Category';
 import Tip from './Component/Exclusive/Tip';
 import Status from './Component/Exclusive/Status';
@@ -18,6 +18,8 @@ import {stringify, parse, copy} from './tool/json';
 import './app.scss';
 import './icon/icons.scss';
 import parser from "./tool/parser";
+import {DROP_TYPE} from "./tool/drag";
+
 
 const store = window.localStorage;
 
@@ -61,6 +63,7 @@ class App extends PureComponent {
         enableAnimate: false, // 禁用动画
         todoEnterAnimate: '',
         theme: ColorTheme.getTheme(), // THEME.DEFAULT,
+        insertValue: '',
     };
 
     componentDidMount() {
@@ -130,7 +133,7 @@ class App extends PureComponent {
      * 对列表进行相关的数据操作 Start
      */
     insertOneData = (data, storeKey, isEnter) => {
-        if(!data || data.value === '') {
+        if (!data || data.value === '') {
             Tip.showTip('输入不可为空');
             return false;
         }
@@ -214,6 +217,55 @@ class App extends PureComponent {
         const realStoreKey = getRealStoreKey(categoryKey, storeKey);
         store.setItem(realStoreKey, stringify(listData));
     };
+    onInsertTag = (tag) => {
+        const {insertValue} = this.state;
+        // 不重复才添加
+        if (insertValue.indexOf(`[${tag}]`) === -1) {
+            this.setState({
+                insertValue: `[${tag}]${insertValue}`
+            });
+        } else {
+            Tip.showTip('不可添加重复的标签');
+        }
+    };
+    onDragEnd = (result) => {
+        const {source, destination} = result;
+        if (!destination) {
+            return;
+        }
+        const todoData = this.state[STORE_TODO_KEY];
+        const sourceIndex = source.index;
+        const sourceMsg = todoData[sourceIndex];
+
+        switch (destination.droppableId) {
+            case DROP_TYPE.TODO: {
+                const newList = [...todoData];
+                const destinationIndex = destination.index;
+                // 根据拖拽结果调整数据顺序
+                if (sourceIndex < destinationIndex) {
+                    for (let i = sourceIndex; i < destinationIndex; i++) {
+                        newList[i] = newList[i + 1];
+                    }
+                } else if (sourceIndex > destinationIndex) {
+                    for (let i = sourceIndex; i > destinationIndex; i--) {
+                        newList[i] = newList[i - 1];
+                    }
+                }
+                newList[destinationIndex] = sourceMsg;
+                this.dragData(newList, STORE_TODO_KEY);
+                break;
+            }
+            case DROP_TYPE.INPUT: {
+                this.setState({
+                   insertValue: sourceMsg.value
+                }, () => {
+                    this.deleteOneData(sourceIndex, STORE_TODO_KEY, false);
+                });
+                break;
+            }
+            default: break;
+        }
+    };
 
     /**
      * 对列表进行相关的数据操作 END
@@ -231,7 +283,7 @@ class App extends PureComponent {
         this.setState({
             [storeKey]: [...newData]
         });
-        if(tempShake === true) {
+        if (tempShake === true) {
             setTimeout(() => {
                 this.brieflyCloseAnimate();
                 let newTempData = copy(tempData);
@@ -300,6 +352,11 @@ class App extends PureComponent {
             value
         }, STORE_TODO_KEY, true);
     };
+    handleInputChange = (value) => {
+        this.setState({
+            insertValue: value
+        })
+    };
     handleToggleTool = () => {
         const {openTool} = this.state;
         this.setState({
@@ -317,74 +374,87 @@ class App extends PureComponent {
      */
 
     render() {
-        const {focus, category, categoryKey, openTool, enableAnimate, todoEnterAnimate, theme} = this.state;
+        const {
+            focus, category, categoryKey, openTool,
+            enableAnimate, todoEnterAnimate, theme,
+            insertValue
+        } = this.state;
         const todoData = this.state[STORE_TODO_KEY];
         const doneData = this.state[STORE_DONE_KEY];
         const isSmall = document.querySelector('body').clientWidth <= 310;
         return (
-            <div id="todo-app" className={cs(`theme-${theme}`, {'is-small': isSmall})} tabIndex="0">
-                <div className={cs('app-wrapper', {'open-tool': openTool})}>
-                    {/* 其它提示 */}
-                    <Tip/>
-                    {/* 当前状态栏 */}
-                    <Status length={todoData.length} onClick={this.handleToggleTool} isActive={openTool}/>
-                    {/* 列表 */}
-                    <div className={cs('list-container', {'focus': focus})}>
-                        <UndoList
-                            id='undo'
-                            storeKey={STORE_TODO_KEY}
-                            className={cs('undo-list')}
-                            list={todoData}
-                            checked={false}
-                            placeholder={"不来一发吗?"}
-                            enterActive={todoEnterAnimate}
-                            transitionEnter={enableAnimate}
-                            transitionLeave={false}
-                            onSelect={this.toggleOneData}
-                            onDelete={this.deleteOneData}
-                            onDrag={this.dragData}
-                            onActive={this.handleActive}/>
-                        {
-                            doneData.length > 0 &&
-                            <div className="done-split"/>
-                        }
-                        <UndoList
-                            id='done'
-                            storeKey={STORE_DONE_KEY}
-                            className={cs('done-list')}
-                            checked small
-                            list={doneData}
-                            enterActive={ANIMATE.INSERT_DONE}
-                            transitionEnter={false}
-                            transitionLeave={false}
-                            onSelect={this.toggleOneData}
-                            onDelete={this.deleteOneData}/>
+            <DragDropContext onDragEnd={this.onDragEnd}>
+                <div id="todo-app" className={cs(`theme-${theme}`, {'is-small': isSmall})} tabIndex="0">
+                    <div className={cs('app-wrapper', {'open-tool': openTool})}>
+                        {/* 其它提示 */}
+                        <Tip/>
+                        {/* 当前状态栏 */}
+                        <Status length={todoData.length} onClick={this.handleToggleTool}
+                                isActive={openTool}/>
+                        {/* 列表 */}
+                        <div className={cs('list-container', {'focus': focus})}>
+                            <UndoList
+                                id={DROP_TYPE.TODO}
+                                storeKey={STORE_TODO_KEY}
+                                className={cs('undo-list')}
+                                list={todoData}
+                                checked={false}
+                                placeholder={"不来一发吗?"}
+                                enterActive={todoEnterAnimate}
+                                transitionEnter={enableAnimate}
+                                transitionLeave={false}
+                                draggable={true}
+                                onSelect={this.toggleOneData}
+                                onDelete={this.deleteOneData}
+                                onActive={this.handleActive}
+                                onInsertTag={this.onInsertTag}/>
+                            {
+                                doneData.length > 0 &&
+                                <div className="done-split"/>
+                            }
+                            <UndoList
+                                id={DROP_TYPE.DONE}
+                                storeKey={STORE_DONE_KEY}
+                                className={cs('done-list')}
+                                checked small
+                                list={doneData}
+                                enterActive={ANIMATE.INSERT_DONE}
+                                transitionEnter={false}
+                                transitionLeave={false}
+                                onSelect={this.toggleOneData}
+                                onDelete={this.deleteOneData}
+                                onInsertTag={this.onInsertTag}/>
+                        </div>
+                        {/* 分类 */}
+                        <Category activeKey={categoryKey}
+                                  options={category}
+                                  onChange={this.changeCategory}/>
+                        {/* 输入框 */}
+                        <Input
+                            id={DROP_TYPE.INPUT}
+                            value={insertValue}
+                            focus={!!focus}
+                            max={LIMIT_WORDS}
+                            onFocus={this.handleInputFocus}
+                            onBlur={this.handleInputBlur}
+                            onEnter={this.handleInputEnter}
+                            onChange={this.handleInputChange}
+                        />
                     </div>
-                    {/* 分类 */}
-                    <Category activeKey={categoryKey}
-                              options={category}
-                              onChange={this.changeCategory}/>
-                    {/* 输入框 */}
-                    <Input
-                        focus={!!focus}
-                        max={LIMIT_WORDS}
-                        onFocus={this.handleInputFocus}
-                        onBlur={this.handleInputBlur}
-                        onEnter={this.handleInputEnter}/>
+                    {/* 工具栏 */}
+                    <Tool isActive={openTool} onClose={this.handleToggleTool}>
+                        <ToolTip title="导出配置">
+                            <ToolBtn type='download' onClick={this.handleSave}/>
+                        </ToolTip>
+                        <ToolTip title="导入配置">
+                            <Uploader type={ACCEPT_TYPE.JSON} onChange={this.handleRead}>
+                                <ToolBtn type='upload'/>
+                            </Uploader>
+                        </ToolTip>
+                        <ColorTheme onChange={this.handleThemeChange}/>
+                    </Tool>
                 </div>
-                {/* 工具栏 */}
-                <Tool isActive={openTool} onClose={this.handleToggleTool}>
-                    <ToolTip title="导出配置">
-                        <ToolBtn type='download' onClick={this.handleSave}/>
-                    </ToolTip>
-                    <ToolTip title="导入配置">
-                        <Uploader type={ACCEPT_TYPE.JSON} onChange={this.handleRead}>
-                            <ToolBtn type='upload'/>
-                        </Uploader>
-                    </ToolTip>
-                    <ColorTheme onChange={this.handleThemeChange}/>
-                </Tool>
-            </div>
+            </DragDropContext>
         );
     }
 }

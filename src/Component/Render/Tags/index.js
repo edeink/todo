@@ -6,6 +6,12 @@ import './index.scss';
 export default class Tags extends PureComponent {
     static propTypes = {
         data: PropTypes.object.isRequired,
+        onDblClick: PropTypes.func,
+    };
+
+    onDoubleClick = (eachTag) => {
+        const {onDblClick} = this.props;
+        onDblClick(eachTag);
     };
 
     render() {
@@ -16,8 +22,9 @@ export default class Tags extends PureComponent {
         return (
             <span className='tags'>
                 {
-                    data.tags.map(function (eachTag) {
-                        return <span className='tag' key={eachTag}>{eachTag}</span>
+                    data.tags.map((eachTag) => {
+                        return <span className='tag' key={eachTag}
+                                     onDoubleClick={() => {this.onDoubleClick(eachTag)}}>{eachTag}</span>
                     })
                 }
             </span>

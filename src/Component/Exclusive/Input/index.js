@@ -1,5 +1,6 @@
-import React, { PureComponent } from 'react';
+import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
+import {Droppable} from "react-beautiful-dnd";
 import cs from 'classnames';
 
 import CloseBtn from '../../Common/CloseBtn/index';
@@ -14,8 +15,20 @@ import './index.scss';
 
 const {RENDER_PARSE_KEY} = TODO_CONFIG;
 
+function getDragOverStyle(isDragOver) {
+    if (isDragOver) {
+        return {
+            color: 'transparent',
+            background: 'rgba(0, 0, 0, .5)',
+            border: '1px solid rgba(255, 255, 255, .8)',
+        }
+    }
+}
+
 export default class Input extends PureComponent {
     static propTypes = {
+        id: PropTypes.string,
+        value: PropTypes.string,
         className: PropTypes.string,
         focus: PropTypes.bool,
         max: PropTypes.number,
@@ -24,6 +37,17 @@ export default class Input extends PureComponent {
         onChange: PropTypes.func,
         onEnter: PropTypes.func,
     };
+
+    componentWillReceiveProps(newProps) {
+        if (newProps.value !== this.state.value) {
+            this.setState({
+                value: newProps.value
+            }, () => {
+                this.refInput.value = newProps.value;
+                this.refInput.focus();
+            });
+        }
+    }
 
     state = {
         value: '',
@@ -34,13 +58,14 @@ export default class Input extends PureComponent {
         if (onEnter && event.nativeEvent.keyCode === KEYCODE.ENTER) {
             const value = this.refInput.value;
             this.setState({value});
-            if(onEnter(value)) {
+            if (onEnter(value)) {
                 this.handleEmptyInput();
             }
         }
     };
 
     handleEmptyInput = () => {
+        this.props.onChange('');
         this.setState({value: ''});
         this.refInput.value = '';
         this.refInput.focus();
@@ -55,12 +80,12 @@ export default class Input extends PureComponent {
             value = value.substr(0, max);
             this.refInput.value = value;
         }
-        this.setState({ value });
+        this.setState({value});
         onChange && onChange(value);
     };
 
     render() {
-        const {className, focus, onFocus, onBlur} = this.props;
+        const {id, className, focus, onFocus, onBlur} = this.props;
         const {value} = this.state;
         const empty = value.length === 0;
         const parseData = parser.parse(value, true);
@@ -71,25 +96,38 @@ export default class Input extends PureComponent {
         // focus && !empty && parseData &&
 
         return (
-            <React.Fragment>
+            <Droppable droppableId={id}>
                 {
-                    (parseData && parseData.length >= 2) &&
-                    <UndoLi className="input-li" listData={renderData}/>
+                    (provided, snapshot) => (
+                        <React.Fragment>
+                            {
+                                (parseData && parseData.length >= 2) &&
+                                <UndoLi className={cs("input-li", {'focus': focus})} listData={renderData}/>
+                            }
+                            <div ref={provided.innerRef}
+                                 className={cs("input-wrapper", className,
+                                     {'empty': empty, 'focus': focus})}>
+                                {provided.placeholder}
+                                <input
+                                    ref={comp => {
+                                        this.refInput = comp
+                                    }}
+                                    style={getDragOverStyle(snapshot.isDraggingOver)}
+                                    placeholder={' Enter 确认'}
+                                    onFocus={onFocus}
+                                    onBlur={onBlur}
+                                    onChange={this.handleInputChange}
+                                    onKeyPress={this.handleKeydown}/>
+                                {
+                                    !empty &&
+                                    <CloseBtn onClick={this.handleEmptyInput}/>
+                                }
+                            </div>
+                        </React.Fragment>
+                    )
                 }
-                <div className={cs("input-wrapper", className, {'empty': empty, 'focus': focus})}>
-                    <input
-                        ref={comp => {this.refInput = comp}}
-                        placeholder={' Enter 确认'}
-                        onFocus={onFocus}
-                        onBlur={onBlur}
-                        onChange={this.handleInputChange}
-                        onKeyPress={this.handleKeydown} />
-                    {
-                        !empty &&
-                        <CloseBtn onClick={this.handleEmptyInput}/>
-                    }
-                </div>
-            </React.Fragment>
+            </Droppable>
+
         )
     }
 }

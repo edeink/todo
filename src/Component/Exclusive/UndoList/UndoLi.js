@@ -23,7 +23,7 @@ const {RENDER_PARSE_KEY, RENDER_ACTIVE_KEY} = TODO_CONFIG;
 const getItemStyle = (isDragging, draggableStyle) => ({
     userSelect: 'none',
     background: isDragging && 'rgba(255, 255, 255, 0.2)',
-    ...draggableStyle
+    ...draggableStyle,
 });
 
 export default class UndoLi extends PureComponent {
@@ -34,14 +34,15 @@ export default class UndoLi extends PureComponent {
         checked: PropTypes.bool,
         storeKey: PropTypes.string,
         className: PropTypes.string,
+        draggable: PropTypes.bool,
         onSelect: PropTypes.func,
         onDelete: PropTypes.func,
-        onDrag: PropTypes.func,
         onActive: PropTypes.func,
+        onInsertTag: PropTypes.func,
     };
 
     _renderLi = () => {
-        const {listData, index, checked, onActive} = this.props;
+        const {listData, index, checked, onActive, onInsertTag} = this.props;
         let collect = listData[RENDER_PARSE_KEY];
         let isActive = listData[RENDER_ACTIVE_KEY];
         return (
@@ -54,7 +55,7 @@ export default class UndoLi extends PureComponent {
                                 return <Time key={key} index={index} onActive={onActive}
                                              data={eachData} disabled={checked}/>;
                             case TOKEN_TYPE.TAG:
-                                return <Tags key={key} data={eachData}/>;
+                                return <Tags key={key} data={eachData} onDblClick={onInsertTag}/>;
                             case TOKEN_TYPE.HYPERLINK:
                                 return <HyperLink key={key} data={eachData}/>;
                             case TOKEN_TYPE.ITALIC:
@@ -77,17 +78,16 @@ export default class UndoLi extends PureComponent {
 
     render() {
         const {
-            index, listData, small,
-            checked, storeKey, className,
-            onSelect, onDelete, onDrag
+            index, listData, small,  checked, storeKey, className,
+            onSelect, onDelete, draggable
         } = this.props;
         const isActive = listData[RENDER_ACTIVE_KEY] === true ? 1 : 0;
-        if (onDrag) {
+        if (draggable) {
             return (
                 <Draggable
                     key={listData.value + isActive}
                     index={index}
-                    isDragDisabled={!onDrag}
+                    isDragDisabled={!draggable}
                     draggableId={listData.value + index}>
                     {(provided, snapshot) => (
                         <li ref={provided.innerRef}
@@ -96,7 +96,7 @@ export default class UndoLi extends PureComponent {
                             {...provided.dragHandleProps}
                             style={getItemStyle(
                                 snapshot.isDragging,
-                                provided.draggableProps.style
+                                provided.draggableProps.style,
                             )}>
                             {
                                 onSelect &&

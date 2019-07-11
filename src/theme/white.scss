@@ -42,22 +42,26 @@ $normal-color: #AEB5C0;
         border-color: $base-color;
       }
     }
-    .message {
-      color: $base-color;
-      .tag {
-        background: rgba(0, 0, 0, .1);
-      }
-      .time {
-        color: $base-color;
-      }
-      .hyperlink button {
-        color: $sec-color;
-        border-bottom: 1px solid rgba(0, 0, 0, .3);
-      }
-      .delete {
-        color: $base-color;
-      }
+  }
+  .message {
+    color: $base-color;
+    .tag {
+      background: rgba(0, 0, 0, .1);
     }
+    .time {
+      color: $base-color;
+    }
+    .hyperlink button {
+      color: $sec-color;
+      border-bottom: 1px solid rgba(0, 0, 0, .3);
+    }
+    .delete {
+      color: $base-color;
+    }
+  }
+  // 预览
+  .input-li.undo-li {
+    color: rgba(0, 0, 0, .2);
   }
   // 类别
   .todo-category ul li {
