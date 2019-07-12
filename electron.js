@@ -19,8 +19,8 @@ const MENU_TYPE = {
     CHECKBOX: 'checkbox',
     RADIO: 'radio',
 };
-const iconPath = path.join(__dirname, './favicon.png');
-const iconClearPath = path.join(__dirname, './favicon_clear.png');
+const iconPath = path.join(__dirname, './img/icon18.png');
+const iconClearPath = path.join(__dirname, './img/icon48.png');
 const aboutMsg =
 `
 版本信息：v0.03 
