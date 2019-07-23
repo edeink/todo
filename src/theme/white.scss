@@ -108,4 +108,19 @@ $normal-color: #AEB5C0;
   ::-webkit-scrollbar-thumb {
     border: 2px solid rgba(0, 0, 0, .15);
   }
+  // 确认
+  .confirm {
+    background: white;
+    .title {
+      color: $base-color;
+    }
+    button {
+      &:hover {
+        background: rgba(0, 0, 0, .05);
+      }
+      &:active {
+        background: rgba(0, 0, 0, .1);
+      }
+    }
+  }
 }

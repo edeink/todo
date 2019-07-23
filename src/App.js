@@ -19,6 +19,7 @@ import './app.scss';
 import './icon/icons.scss';
 import parser from "./tool/parser";
 import {DROP_TYPE} from "./tool/drag";
+import Confirm from "./Component/Common/Modal/Confirm";
 
 
 const store = window.localStorage;
@@ -64,6 +65,8 @@ class App extends PureComponent {
         todoEnterAnimate: '',
         theme: ColorTheme.getTheme(), // THEME.DEFAULT,
         insertValue: '',
+        confirmVisible: false,
+        confirmText: '',
     };
 
     componentDidMount() {
@@ -108,6 +111,7 @@ class App extends PureComponent {
             });
         });
     };
+
     // 读取每列数据
     _readList = () => {
         return new Promise((resolve) => {
@@ -185,6 +189,7 @@ class App extends PureComponent {
         });
         return true;
     };
+
     // 完成或未完成列表
     toggleOneData = (index, value, storeKey) => {
         const preData = this.state[storeKey];
@@ -194,8 +199,30 @@ class App extends PureComponent {
             this.deleteOneData(index, storeKey, true);
         }
     };
+
     // 删除列表
-    deleteOneData = (index, storeKey, enableAnimate) => {
+    deleteOneData = (index, storeKey, enableAnimate, showConfirm) => {
+        // 是否弹出删除按钮
+        if (showConfirm === true) {
+            this.onConfirm = () => {
+                this.setState({
+                    confirmVisible: false,
+                    confirmText: '',
+                });
+                this.deleteOneData(index, storeKey, enableAnimate);
+            };
+            this.onConfirmCancel = () => {
+                this.setState({
+                    confirmVisible: false,
+                    confirmText: '',
+                });
+            };
+            this.setState({
+                confirmVisible: true,
+                confirmText: '是否确认删除',
+            });
+            return false;
+        }
         const {categoryKey} = this.state;
         const preData = this.state[storeKey];
         const newData = [...preData];
@@ -209,6 +236,7 @@ class App extends PureComponent {
             [storeKey]: newData
         });
     };
+
     dragData = (listData, storeKey) => {
         const {categoryKey} = this.state;
         this.setState({
@@ -217,6 +245,7 @@ class App extends PureComponent {
         const realStoreKey = getRealStoreKey(categoryKey, storeKey);
         store.setItem(realStoreKey, stringify(listData));
     };
+
     onInsertTag = (tag) => {
         const {insertValue} = this.state;
         // 不重复才添加
@@ -228,6 +257,7 @@ class App extends PureComponent {
             Tip.showTip('不可添加重复的标签');
         }
     };
+
     onDragEnd = (result) => {
         const {source, destination} = result;
         if (!destination) {
@@ -266,7 +296,6 @@ class App extends PureComponent {
             default: break;
         }
     };
-
     /**
      * 对列表进行相关的数据操作 END
      */
@@ -377,7 +406,7 @@ class App extends PureComponent {
         const {
             focus, category, categoryKey, openTool,
             enableAnimate, todoEnterAnimate, theme,
-            insertValue
+            insertValue, confirmVisible, confirmText
         } = this.state;
         const todoData = this.state[STORE_TODO_KEY];
         const doneData = this.state[STORE_DONE_KEY];
@@ -441,6 +470,11 @@ class App extends PureComponent {
                             onChange={this.handleInputChange}
                         />
                     </div>
+                    {/*确认信息*/}
+                    <Confirm show={confirmVisible}
+                             title={confirmText}
+                             onOk={this.onConfirm}
+                             onCancel={this.onConfirmCancel}/>
                     {/* 工具栏 */}
                     <Tool isActive={openTool} onClose={this.handleToggleTool}>
                         <ToolTip title="导出配置">

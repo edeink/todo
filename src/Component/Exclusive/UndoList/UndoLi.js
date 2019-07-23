@@ -111,7 +111,7 @@ export default class UndoLi extends PureComponent {
                             {
                                 onDelete &&
                                 <CloseBtn onClick={(event) => {
-                                    onDelete(index, storeKey, event)
+                                    onDelete(index, storeKey, event, true)
                                 }}/>
                             }
 
