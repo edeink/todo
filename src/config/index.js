@@ -17,6 +17,7 @@ const TODO_CONFIG = {
     RENDER_PARSE_KEY: '__parseData',
     RENDER_ACTIVE_KEY: '__active',
     RENDER_STRING_KEY: '__string',
+    RENDER_TAGS_KEY: '__tags',
 };
 
 export default TODO_CONFIG;

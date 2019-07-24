@@ -20,6 +20,7 @@ import './icon/icons.scss';
 import parser from "./tool/parser";
 import {DROP_TYPE} from "./tool/drag";
 import Confirm from "./Component/Common/Modal/Confirm";
+import FilterTags from "./Component/Exclusive/FilterTags";
 
 
 const store = window.localStorage;
@@ -33,7 +34,8 @@ const ANIMATE = {
 const {
     CATEGORY_LIST, LIMIT_WORDS, STORE_TODO_KEY,
     STORE_DONE_KEY, STORE_CATEGORY_KEY, STORE_ACTIVE_CATEGORY_KEY,
-    RENDER_ACTIVE_KEY, RENDER_PARSE_KEY, RENDER_STRING_KEY
+    RENDER_ACTIVE_KEY, RENDER_PARSE_KEY, RENDER_STRING_KEY,
+    RENDER_TAGS_KEY
 } = TODO_CONFIG;
 const LIST_KEYS = [STORE_TODO_KEY, STORE_DONE_KEY];
 const INIT_CATEGORY_KEY = CATEGORY_LIST[0].key;
@@ -67,6 +69,8 @@ class App extends PureComponent {
         insertValue: '',
         confirmVisible: false,
         confirmText: '',
+        tags: [], // 当前分类拥有的Tag
+        filterTag: [], // 需要过滤的tag
     };
 
     componentDidMount() {
@@ -115,18 +119,26 @@ class App extends PureComponent {
     // 读取每列数据
     _readList = () => {
         return new Promise((resolve) => {
-            const {categoryKey} = this.state;
+            const {categoryKey, tags} = this.state;
+            const newTags = new Set(tags);
             LIST_KEYS.forEach((eachKey) => {
                 const storeKey = getRealStoreKey(categoryKey, eachKey);
                 const tempData = parse(store.getItem(storeKey), []);
                 tempData.forEach(function (eachData) {
                     if (!eachData[RENDER_PARSE_KEY]) {
                         eachData[RENDER_PARSE_KEY] = parser.parse(eachData.value);
-                        eachData[RENDER_STRING_KEY] = eachData[RENDER_PARSE_KEY][0][RENDER_STRING_KEY];
+                        // 一般通用数据都放在第一条数据上
+                        const firstRenderData = eachData[RENDER_PARSE_KEY][0];
+                        eachData[RENDER_STRING_KEY] = firstRenderData[RENDER_STRING_KEY];
+                        eachData[RENDER_TAGS_KEY] = firstRenderData[RENDER_TAGS_KEY];
+                        eachData[RENDER_TAGS_KEY].forEach(function (eachTag) {
+                            newTags.add(eachTag);
+                        });
                     }
                 });
                 this.setState({
-                    [eachKey]: tempData
+                    [eachKey]: tempData,
+                    tags: Array.from(newTags),
                 });
             });
             resolve();
@@ -142,7 +154,7 @@ class App extends PureComponent {
             return false;
         }
 
-        const {categoryKey} = this.state;
+        const {categoryKey, tags} = this.state;
         const preData = this.state[storeKey];
 
         // 解析该行命令
@@ -155,7 +167,9 @@ class App extends PureComponent {
             data[RENDER_ACTIVE_KEY] = false;
         }
         if (!data[RENDER_STRING_KEY]) {
-            data[RENDER_STRING_KEY] = data[RENDER_PARSE_KEY][0][RENDER_STRING_KEY];
+            const firstRenderData = data[RENDER_PARSE_KEY][0];
+            data[RENDER_STRING_KEY] = firstRenderData[RENDER_STRING_KEY];
+            data[RENDER_TAGS_KEY] = firstRenderData[RENDER_TAGS_KEY];
         }
 
         // 校验数据是否合法
@@ -182,10 +196,16 @@ class App extends PureComponent {
 
         // 更改数据
         newData.unshift(data);
+        // 添加新的Tags
+        const newTags = new Set(tags);
+        data[RENDER_TAGS_KEY].forEach(function (tag) {
+            newTags.add(tag);
+        });
         const realStoreKey = getRealStoreKey(categoryKey, storeKey);
         store.setItem(realStoreKey, stringify(newData));
         this.setState({
             [storeKey]: newData,
+            tags: Array.from(newTags)
         });
         return true;
     };
@@ -256,6 +276,12 @@ class App extends PureComponent {
         } else {
             Tip.showTip('不可添加重复的标签');
         }
+    };
+
+    changeFilter = (filterTag) => {
+        this.setState({
+            filterTag
+        })
     };
 
     onDragEnd = (result) => {
@@ -406,7 +432,8 @@ class App extends PureComponent {
         const {
             focus, category, categoryKey, openTool,
             enableAnimate, todoEnterAnimate, theme,
-            insertValue, confirmVisible, confirmText
+            insertValue, confirmVisible, confirmText,
+            tags, filterTag,
         } = this.state;
         const todoData = this.state[STORE_TODO_KEY];
         const doneData = this.state[STORE_DONE_KEY];
@@ -422,12 +449,14 @@ class App extends PureComponent {
                                 isActive={openTool}/>
                         {/* 列表 */}
                         <div className={cs('list-container', {'focus': focus})}>
+                            <FilterTags tags={tags} onChange={this.changeFilter}/>
                             <UndoList
                                 id={DROP_TYPE.TODO}
                                 storeKey={STORE_TODO_KEY}
                                 className={cs('undo-list')}
                                 list={todoData}
                                 checked={false}
+                                filterTag={filterTag}
                                 placeholder={"不来一发吗?"}
                                 enterActive={todoEnterAnimate}
                                 transitionEnter={enableAnimate}
@@ -446,6 +475,7 @@ class App extends PureComponent {
                                 storeKey={STORE_DONE_KEY}
                                 className={cs('done-list')}
                                 checked small
+                                filterTag={filterTag}
                                 list={doneData}
                                 enterActive={ANIMATE.INSERT_DONE}
                                 transitionEnter={false}

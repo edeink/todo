@@ -34,6 +34,7 @@ export default class UndoLi extends PureComponent {
         checked: PropTypes.bool,
         storeKey: PropTypes.string,
         className: PropTypes.string,
+        isMatch: PropTypes.bool,
         draggable: PropTypes.bool,
         onSelect: PropTypes.func,
         onDelete: PropTypes.func,
@@ -78,8 +79,8 @@ export default class UndoLi extends PureComponent {
 
     render() {
         const {
-            index, listData, small,  checked, storeKey, className,
-            onSelect, onDelete, draggable
+            index, listData, small, checked, storeKey, className,
+            onSelect, onDelete, draggable, isMatch
         } = this.props;
         const isActive = listData[RENDER_ACTIVE_KEY] === true ? 1 : 0;
         if (draggable) {
@@ -91,7 +92,7 @@ export default class UndoLi extends PureComponent {
                     draggableId={listData.value + index}>
                     {(provided, snapshot) => (
                         <li ref={provided.innerRef}
-                            className={cs("li", className, {"checked": checked})}
+                            className={cs("li", className, {"checked": checked, "hidden": isMatch === false})}
                             {...provided.draggableProps}
                             {...provided.dragHandleProps}
                             style={getItemStyle(
@@ -121,7 +122,7 @@ export default class UndoLi extends PureComponent {
             )
         } else {
             return (
-                <li className={cs("li undo-li", className, {"checked": checked})}>
+                <li className={cs("li undo-li", className, {"checked": checked,  "hidden": isMatch === false})}>
                     {
                         onSelect &&
                         <Checkbox

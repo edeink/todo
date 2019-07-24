@@ -25,6 +25,9 @@ $normal-color: #AEB5C0;
   .tips {
     color: $base-color;
   }
+  .done-split {
+    background: #e1e1e1;
+  }
   // 列表
   .list {
     li {
@@ -120,6 +123,22 @@ $normal-color: #AEB5C0;
       }
       &:active {
         background: rgba(0, 0, 0, .1);
+      }
+    }
+  }
+  .filter-tag-list {
+    .filter-tag {
+      border: 1px solid white;
+      background: white;
+      cursor: pointer;
+      &:hover {
+        background: rgba(0, 0, 0, .05);
+      }
+      &.is-active {
+        border: 1px solid #efefef;
+        color: $base-color;
+        background: rgba(0, 0, 0, .05);;
+        opacity: 1;
       }
     }
   }

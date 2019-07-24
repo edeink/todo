@@ -110,6 +110,7 @@ const parser = {
         }
         // 默认完整的解析在第一个结构中
         collection[0][TODO_CONFIG.RENDER_STRING_KEY] = explain.getMessage(collection);
+        collection[0][TODO_CONFIG.RENDER_TAGS_KEY] = explain.getTags(collection);
         if(closeTips !== true) {
             // console.log(`执行解析数据: ${txt}`);
             console.log(`txt: ${txt}, parseData:`, collection);
@@ -533,6 +534,16 @@ const explain = {
             }
         });
         return str;
+    },
+    getTags(collection) {
+        let tags = new Set();
+        collection.forEach(function (eachBlock) {
+            let eachData = eachBlock.data;
+            if (eachBlock.key === TOKEN_TYPE.TAG) {
+                tags.add(eachData.value);
+            }
+        });
+        return Array.from(tags);
     },
 };
 

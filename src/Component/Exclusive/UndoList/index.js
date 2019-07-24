@@ -7,8 +7,11 @@ import cs from 'classnames';
 import UndoLi from './UndoLi';
 
 import {stringify} from "../../../tool/json";
+import TODO_CONFIG from '../../../config';
 
 import './index.scss';
+
+const {RENDER_TAGS_KEY} = TODO_CONFIG;
 
 export default class UndoList extends Component {
     static propTypes = {
@@ -17,6 +20,7 @@ export default class UndoList extends Component {
         storeKey: PropTypes.string.isRequired,
         list: PropTypes.array,
         checked: PropTypes.bool,
+        filterTag: PropTypes.array,
         small: PropTypes.bool,
         placeholder: PropTypes.string,
         enterActive: PropTypes.string,
@@ -31,13 +35,16 @@ export default class UndoList extends Component {
     };
 
     shouldComponentUpdate(nextProps) {
-        const {list} = this.props;
+        const {list, filterTag} = this.props;
         if (list.length !== nextProps.list.length) {
             return true;
         }
         let preList = stringify(list);
         let newList = stringify(nextProps.list);
         if (preList !== newList) {
+            return true;
+        }
+        if (filterTag !== nextProps.filterTag) {
             return true;
         }
         return false;
@@ -48,8 +55,15 @@ export default class UndoList extends Component {
         onActive(index, storeKey);
     };
 
-    _renderUndoLi(eachList, index) {
+    _renderUndoLi(eachList, index, filterTag) {
         const {small, checked, storeKey, draggable, onSelect, onDelete, onInsertTag} = this.props;
+        const tags = eachList[RENDER_TAGS_KEY];
+        let isMatch = true;
+        if (filterTag.length > 0) {
+            isMatch = filterTag.some(function(eachFilterTag) {
+                return tags.indexOf(eachFilterTag) !== -1;
+            });
+        }
         return (
             <UndoLi
                 listData={eachList}
@@ -57,6 +71,7 @@ export default class UndoList extends Component {
                 index={index}
                 small={small}
                 checked={checked}
+                isMatch={isMatch}
                 storeKey={storeKey}
                 draggable={draggable}
                 onSelect={onSelect}
@@ -70,6 +85,7 @@ export default class UndoList extends Component {
         let {
             id, placeholder, className, list,
             enterActive, leaveActive, transitionEnter, transitionLeave,
+            filterTag,
         } = this.props;
 
         return (
@@ -97,7 +113,7 @@ export default class UndoList extends Component {
                                 transitionLeaveTimeout={200}>
                                 {
                                     list.map((eachList, index) => {
-                                        return this._renderUndoLi(eachList, index);
+                                        return this._renderUndoLi(eachList, index, filterTag);
                                     })
                                 }
                             </CSSTransitionGroup>
