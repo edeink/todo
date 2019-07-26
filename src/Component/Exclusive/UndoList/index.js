@@ -61,7 +61,7 @@ export default class UndoList extends Component {
         let isMatch = true;
         if (filterTag.length > 0) {
             isMatch = filterTag.some(function(eachFilterTag) {
-                return tags.indexOf(eachFilterTag) !== -1;
+                return tags.has(eachFilterTag);
             });
         }
         return (

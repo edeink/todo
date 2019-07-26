@@ -17,7 +17,7 @@ import {TOKEN_TYPE} from "../../../tool/parser";
 
 import './index.scss';
 
-const {RENDER_PARSE_KEY, RENDER_ACTIVE_KEY} = TODO_CONFIG;
+const {RENDER_PARSE_KEY, RENDER_ACTIVE_KEY, RENDER_TIME_KEY} = TODO_CONFIG;
 
 // 拖拽的样式
 const getItemStyle = (isDragging, draggableStyle) => ({
@@ -46,6 +46,7 @@ export default class UndoLi extends PureComponent {
         const {listData, index, checked, onActive, onInsertTag} = this.props;
         let collect = listData[RENDER_PARSE_KEY];
         let isActive = listData[RENDER_ACTIVE_KEY];
+        let time = listData[RENDER_TIME_KEY];
         return (
             <div className={cs('message', {'is-active animated tada': isActive && !checked})}>
                 {
@@ -53,8 +54,9 @@ export default class UndoLi extends PureComponent {
                         let key = eachData.begin + eachData.content;
                         switch (eachData.key) {
                             case TOKEN_TYPE.TIME:
-                                return <Time key={key} index={index} onActive={onActive}
-                                             data={eachData} disabled={checked}/>;
+                                return <Time key={key} index={index} isActive={isActive}
+                                             data={eachData} disabled={checked} time={time}
+                                             onActive={onActive}/>;
                             case TOKEN_TYPE.TAG:
                                 return <Tags key={key} data={eachData} onDblClick={onInsertTag}/>;
                             case TOKEN_TYPE.HYPERLINK:

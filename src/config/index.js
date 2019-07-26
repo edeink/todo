@@ -18,6 +18,7 @@ const TODO_CONFIG = {
     RENDER_ACTIVE_KEY: '__active',
     RENDER_STRING_KEY: '__string',
     RENDER_TAGS_KEY: '__tags',
+    RENDER_TIME_KEY: '__time',
 };
 
 export default TODO_CONFIG;

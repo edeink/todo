@@ -84,6 +84,13 @@ export default class ToolTip extends PureComponent {
         children: PropTypes.object,
     };
 
+    componentWillUnmount() {
+        if (popup && popup.isConnected && appendAnchor) {
+            ReactDOM.unmountComponentAtNode(popup);
+            appendAnchor.removeChild(popup);
+        }
+    }
+
     handleMouseEnter = (e) => {
         const {pageX: x, pageY: y, currentTarget: target} = e;
         const {title} = this.props;

@@ -35,7 +35,7 @@ const {
     CATEGORY_LIST, LIMIT_WORDS, STORE_TODO_KEY,
     STORE_DONE_KEY, STORE_CATEGORY_KEY, STORE_ACTIVE_CATEGORY_KEY,
     RENDER_ACTIVE_KEY, RENDER_PARSE_KEY, RENDER_STRING_KEY,
-    RENDER_TAGS_KEY
+    RENDER_TAGS_KEY, RENDER_TIME_KEY
 } = TODO_CONFIG;
 const LIST_KEYS = [STORE_TODO_KEY, STORE_DONE_KEY];
 const INIT_CATEGORY_KEY = CATEGORY_LIST[0].key;
@@ -119,8 +119,8 @@ class App extends PureComponent {
     // 读取每列数据
     _readList = () => {
         return new Promise((resolve) => {
-            const {categoryKey, tags} = this.state;
-            const newTags = new Set(tags);
+            const {categoryKey} = this.state;
+            const newTags = new Set();
             LIST_KEYS.forEach((eachKey) => {
                 const storeKey = getRealStoreKey(categoryKey, eachKey);
                 const tempData = parse(store.getItem(storeKey), []);
@@ -131,6 +131,7 @@ class App extends PureComponent {
                         const firstRenderData = eachData[RENDER_PARSE_KEY][0];
                         eachData[RENDER_STRING_KEY] = firstRenderData[RENDER_STRING_KEY];
                         eachData[RENDER_TAGS_KEY] = firstRenderData[RENDER_TAGS_KEY];
+                        eachData[RENDER_TIME_KEY] = eachData[RENDER_TIME_KEY] || firstRenderData[RENDER_TIME_KEY];
                         eachData[RENDER_TAGS_KEY].forEach(function (eachTag) {
                             newTags.add(eachTag);
                         });
@@ -159,6 +160,7 @@ class App extends PureComponent {
 
         // 解析该行命令
         const newData = [...preData];
+
         if (!data[RENDER_PARSE_KEY]) {
             data[RENDER_PARSE_KEY] = parser.parse(data.value);
         }
@@ -170,6 +172,7 @@ class App extends PureComponent {
             const firstRenderData = data[RENDER_PARSE_KEY][0];
             data[RENDER_STRING_KEY] = firstRenderData[RENDER_STRING_KEY];
             data[RENDER_TAGS_KEY] = firstRenderData[RENDER_TAGS_KEY];
+            data[RENDER_TIME_KEY] = firstRenderData[RENDER_TIME_KEY];
         }
 
         // 校验数据是否合法
@@ -223,19 +226,23 @@ class App extends PureComponent {
     // 删除列表
     deleteOneData = (index, storeKey, enableAnimate, showConfirm) => {
         // 是否弹出删除按钮
-        if (showConfirm === true) {
+        this.preDeleteTime = this.preDeleteTime || 0;
+        let minIntervalTime = 1000 * 60 * 5; // 五分钟
+        if (showConfirm === true && Date.now() - this.preDeleteTime > minIntervalTime) {
             this.onConfirm = () => {
                 this.setState({
                     confirmVisible: false,
                     confirmText: '',
                 });
                 this.deleteOneData(index, storeKey, enableAnimate);
+                this.preDeleteTime = Date.now();
             };
             this.onConfirmCancel = () => {
                 this.setState({
                     confirmVisible: false,
                     confirmText: '',
                 });
+                this.preDeleteTime = Date.now();
             };
             this.setState({
                 confirmVisible: true,
@@ -283,6 +290,10 @@ class App extends PureComponent {
             filterTag
         })
     };
+
+    onDragStart = () => {
+        document.activeElement && document.activeElement.blur();
+    }
 
     onDragEnd = (result) => {
         const {source, destination} = result;
@@ -439,7 +450,7 @@ class App extends PureComponent {
         const doneData = this.state[STORE_DONE_KEY];
         const isSmall = document.querySelector('body').clientWidth <= 310;
         return (
-            <DragDropContext onDragEnd={this.onDragEnd}>
+            <DragDropContext onDragEnd={this.onDragEnd} onDragStart={this.onDragStart}>
                 <div id="todo-app" className={cs(`theme-${theme}`, {'is-small': isSmall})} tabIndex="0">
                     <div className={cs('app-wrapper', {'open-tool': openTool})}>
                         {/* 其它提示 */}

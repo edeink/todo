@@ -1,6 +1,8 @@
 import TODO_CONFIG from '../config';
 import PARSER_TEST from './parser_test';
 
+const {RENDER_STRING_KEY, RENDER_TAGS_KEY, RENDER_TIME_KEY} = TODO_CONFIG;
+
 const TOKEN_TYPE = {
     TIME: 'time',
     TAG: 'tag',
@@ -108,9 +110,11 @@ const parser = {
             let textResult = parser.getText(txt, startTextIndex);
             collection.push(textResult);
         }
+
         // 默认完整的解析在第一个结构中
-        collection[0][TODO_CONFIG.RENDER_STRING_KEY] = explain.getMessage(collection);
-        collection[0][TODO_CONFIG.RENDER_TAGS_KEY] = explain.getTags(collection);
+        const summaryInfo = explain.getSummaryInfo(collection);
+        collection[0] = Object.assign(collection[0], summaryInfo);
+
         if(closeTips !== true) {
             // console.log(`执行解析数据: ${txt}`);
             console.log(`txt: ${txt}, parseData:`, collection);
@@ -441,7 +445,14 @@ const explain = {
 
         // 分析delay
         if (delay) {
-            let unit = delay[delay.length - 1];
+            let unit = null;
+            for(let i = 0; i<delay.length; i++) {
+                let tempChar = delay[i];
+                if(Number.isNaN(parseInt(tempChar))) {
+                    unit = tempChar;
+                    i = delay.length;
+                }
+            }
             let value = null;
             if (TIME_UNIT_ARRAY.indexOf(unit) === -1) {
                 let day = explain.getChineseDay(delay);
@@ -481,7 +492,7 @@ const explain = {
             let clockArray = clock.split(':');
             if (clockArray.length === 1) {
                 if (Number.isInteger(clockArray[0])) {
-                    hour = clockArray[0];
+                    hour = parseInt(clockArray[0]);
                 } else {
                     let day = explain.getChineseDay(clockArray[0]);
                     if (Number.isInteger(day)) {
@@ -492,8 +503,8 @@ const explain = {
                     }
                 }
             } else {
-                hour = clockArray[0];
-                minutes = clockArray[1];
+                hour = parseInt(clockArray[0]);
+                minutes = parseInt(clockArray[1]);
             }
         }
 
@@ -523,27 +534,23 @@ const explain = {
                 return undefined;
         }
     },
-    getMessage(collection) {
-        let str = '';
+    getSummaryInfo(collection) {
+        let tempInfo = {
+            [RENDER_STRING_KEY]: '',
+            [RENDER_TAGS_KEY]: new Set(),
+            [RENDER_TIME_KEY]: '',
+        };
         collection.forEach(function (eachBlock) {
             let eachData = eachBlock.data;
-            if (eachBlock.key === TOKEN_TYPE.TIME || eachBlock.key === TOKEN_TYPE.TAG) {
-
+            if (eachBlock.key === TOKEN_TYPE.TIME) {
+                tempInfo[RENDER_TIME_KEY] = eachBlock.data.timeStamp;
+            } else if(eachBlock.key === TOKEN_TYPE.TAG) {
+                tempInfo[RENDER_TAGS_KEY].add(eachBlock.data.value);
             } else {
-                str += eachData.value;
+                tempInfo[RENDER_STRING_KEY] += eachData.value;
             }
         });
-        return str;
-    },
-    getTags(collection) {
-        let tags = new Set();
-        collection.forEach(function (eachBlock) {
-            let eachData = eachBlock.data;
-            if (eachBlock.key === TOKEN_TYPE.TAG) {
-                tags.add(eachData.value);
-            }
-        });
-        return Array.from(tags);
+        return tempInfo;
     },
 };
 

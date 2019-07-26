@@ -39,7 +39,10 @@
     }
 
     &.hidden {
-      display: none;
+      height: 1px;
+      padding: 0;
+      overflow: hidden;
+      opacity: 0;
     }
   }
   .message {

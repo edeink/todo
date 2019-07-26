@@ -1,7 +1,7 @@
 // import fastJson from 'fast-json-stringify';
 import TODO_CONFIG from '../config';
 
-const {RENDER_ACTIVE_KEY, RENDER_STRING_KEY} = TODO_CONFIG;
+const {RENDER_ACTIVE_KEY, RENDER_STRING_KEY, RENDER_TIME_KEY} = TODO_CONFIG;
 
 // 该方法只针对列表数据，用以过滤不必要的数据
 const stringify = function (array) {
@@ -10,11 +10,15 @@ const stringify = function (array) {
     } else {
         let newArray = [];
         array.forEach((eachData) => {
-            newArray.push({
+            let tempData = {
                 value: eachData.value,
                 [RENDER_ACTIVE_KEY]: eachData[RENDER_ACTIVE_KEY],
                 [RENDER_STRING_KEY]: eachData[RENDER_STRING_KEY],
-            });
+            };
+            if (eachData[RENDER_TIME_KEY]) {
+                tempData[RENDER_TIME_KEY] = eachData[RENDER_TIME_KEY]
+            }
+            newArray.push(tempData);
         });
         return JSON.stringify(newArray) ;
     }
