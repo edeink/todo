@@ -14,6 +14,7 @@ import ToolTip from './Component/Common/ToolTip';
 import TODO_CONFIG from './config';
 import fileHelper from './tool/file';
 import {stringify, parse, copy} from './tool/json';
+import {isWindows} from './tool/userAgent';
 
 import './app.scss';
 import './icon/icons.scss';
@@ -448,10 +449,11 @@ class App extends PureComponent {
         } = this.state;
         const todoData = this.state[STORE_TODO_KEY];
         const doneData = this.state[STORE_DONE_KEY];
-        const isSmall = document.querySelector('body').clientWidth <= 310;
+        const isSmall = document.querySelector('#root').clientWidth <= 310;
         return (
             <DragDropContext onDragEnd={this.onDragEnd} onDragStart={this.onDragStart}>
-                <div id="todo-app" className={cs(`theme-${theme}`, {'is-small': isSmall})} tabIndex="0">
+                <div id="todo-app" className={cs(`theme-${theme}`,
+                    {'is-small': isSmall}, {'is-win': isWindows})} tabIndex="0">
                     <div className={cs('app-wrapper', {'open-tool': openTool})}>
                         {/* 其它提示 */}
                         <Tip/>

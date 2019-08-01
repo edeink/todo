@@ -27,15 +27,18 @@ const aboutMsg =
 联系作者：edeity.fly@gmail.com
 了解更多：https://github.com/edeity/todo
 `;
-const winWidth = 310;
+const winWidth = 320;
 const winHeight = 300;
 
 function createWindow() {
     const { width: screenWidth, height: screenHeight } = electron.screen.getPrimaryDisplay().workAreaSize;
+    let initX = parseInt(screenWidth - winWidth);
+    let initY = parseInt((screenHeight - winHeight) / 2);
+    let isMax = false;
     // 初始化窗口
     win = new BrowserWindow({
-        x: parseInt(screenWidth - winWidth),
-        y: parseInt((screenHeight - winHeight) / 2),
+        x: initX,
+        y: initY,
         icon: iconPath,
         width: winWidth,
         height: winHeight,
@@ -63,16 +66,15 @@ function createWindow() {
     const trayMenu = [
         {
             label:  '隐藏', type: MENU_TYPE.BUTTON, click: function () {
-                if (win.isVisible()) {
-                    win.hide();
-                    trayMenu[0].label = '显示';
-                } else {
-                    win.show();
-                    trayMenu[0].label = '隐藏';
-                }
-                trayUpdate(trayMenu);
+                hideOrShow();
             },
             accelerator: 'CommandOrControl+Shift+D',
+        },
+        {
+            label: '展开', type: MENU_TYPE.BUTTON, click: function () {
+                maxOrMin();
+            },
+            accelerator: 'CommandOrControl+Shift+O',
         },
         {
             label: '显示层级', submenu: [
@@ -135,6 +137,31 @@ function createWindow() {
         },
     ];
 
+    function hideOrShow() {
+        if (win.isVisible()) {
+            win.hide();
+            trayMenu[0].label = '显示';
+        } else {
+            win.show();
+            trayMenu[0].label = '隐藏';
+        }
+        trayUpdate(trayMenu);
+    }
+    function maxOrMin() {
+        if (!isMax) {
+            win.setSize(winWidth, screenHeight);
+            win.setPosition(parseInt(screenWidth - winWidth), 0);
+            trayMenu[1].label = '收起';
+
+        } else {
+            win.setSize(winWidth, winHeight);
+            win.setPosition(initX, initY);
+            trayMenu[1].label = '展开';
+            isMax = true;
+        }
+        isMax = !isMax;
+        trayUpdate(trayMenu);
+    }
 
     function trayUpdate(trayMenu) {
         const contextMenu = Menu.buildFromTemplate(trayMenu);
@@ -153,20 +180,10 @@ function createWindow() {
     Menu.setApplicationMenu(menu); // 设置菜单部分
 
     // 注册快捷键按
-    globalShortcut.register('CommandOrControl+Shift+D', () => {
-        if (win.isVisible()) {
-            win.hide();
-            trayMenu[0].label = '显示';
-        } else {
-            win.show();
-            trayMenu[0].label = '隐藏';
-        }
-        trayUpdate(trayMenu);
-    });
-    globalShortcut.register('Esc', () => {
-        if (win.isFocused()) {
-            win.hide();
-        }
+    trayMenu.forEach(function (eachTray) {
+       if (eachTray.accelerator) {
+           globalShortcut.register(eachTray.accelerator, eachTray.click);
+       }
     });
 
     // 系统通知

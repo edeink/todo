@@ -1,12 +1,12 @@
 #todo-app {
     position: absolute;
     width: 310px;
-    height: 300px;
+    height: calc(100% - 20px);
     top: 0;
     left: 0;
     right: 0;
     bottom: 0;
-    margin: auto;
+    margin: 10px auto;
     border: 1px solid rgba(255, 255, 255, .5);
     border-radius: 8px;
     color: #e1e1e1;
@@ -14,8 +14,11 @@
     -webkit-app-region: drag;
     user-select: none;
     overflow: hidden;
-    box-shadow: 0px 0px 10px rgba(0, 0, 0, .9);
+    box-shadow: 0 0 10px rgba(0, 0, 0, .9);
+    transition: box-shadow .3s ease-in-out;
     &.is-small {
+        height: 100%;
+        margin: auto;
         box-shadow: none;
     }
     &::before {
@@ -28,14 +31,17 @@
         border-radius: 8px;
         background: rgba(0, 0, 0, 0.8);
         z-index: -1;
+        transition: background-color .3s ease-in-out;
     }
     .app-wrapper {
+        height: 100%;
+        padding-top: 10px;
         &.open-tool {
             filter: blur(4px);
         }
     }
     .list-container {
-        height: 260px;
+        height: calc(100% - 30px);
         padding: 0 16px;
         margin-bottom: 20px;
         overflow: auto;
@@ -63,22 +69,25 @@
             }
         }
         &.focus {
-            height: 230px;
+            height: calc(100% - 60px);
         }
     }
 
-    // 编辑区滚动条样式
-    ::-webkit-scrollbar {
-        width: 4px;
-    }
-    ::-webkit-scrollbar-button {
-        width: 0;
-        height: 0;
-    }
-    ::-webkit-scrollbar-thumb {
-        background-clip: padding-box;
-        border: 2px solid rgba(255, 255, 255, .6);
-        border-radius: 2px;
-        min-height: 24px;
+    // windows下美化滚动条样式
+    &.is-win {
+        // 编辑区滚动条样式
+        ::-webkit-scrollbar {
+            width: 4px;
+        }
+        ::-webkit-scrollbar-button {
+            width: 0;
+            height: 0;
+        }
+        ::-webkit-scrollbar-thumb {
+            background-clip: padding-box;
+            border: 2px solid rgba(255, 255, 255, .6);
+            border-radius: 2px;
+            min-height: 24px;
+        }
     }
 }
