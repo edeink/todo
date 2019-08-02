@@ -544,10 +544,12 @@ const explain = {
             let eachData = eachBlock.data;
             if (eachBlock.key === TOKEN_TYPE.TIME) {
                 tempInfo[RENDER_TIME_KEY] = eachBlock.data.timeStamp;
-            } else if(eachBlock.key === TOKEN_TYPE.TAG) {
+            } else if(eachBlock.key === TOKEN_TYPE.TAG && eachBlock.data && eachBlock.data.value) {
                 tempInfo[RENDER_TAGS_KEY].add(eachBlock.data.value);
             } else {
-                tempInfo[RENDER_STRING_KEY] += eachData.value;
+                if (eachData && eachData.value) {
+                    tempInfo[RENDER_STRING_KEY] += eachData.value;
+                }
             }
         });
         return tempInfo;

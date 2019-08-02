@@ -56,7 +56,7 @@ export default class Time extends Component {
 
     notify() {
         const {index, data, onActive} = this.props;
-        notify('亲，你还有事件没做哦', data[TODO_CONFIG.RENDER_STRING_KEY]);
+        notify('约定时间到！', data[TODO_CONFIG.RENDER_STRING_KEY]);
         if (this.updateTimeKey) {
             clearTimeout(this.updateTimeKey);
         }

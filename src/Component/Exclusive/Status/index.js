@@ -2,16 +2,10 @@ import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
 import cs from 'classnames';
 import './index.scss';
-
-const STATUS = {
-    GOOD: 'good',
-    OK: 'ok',
-    BUSY: 'busy',
-};
+import ToolTip from "../../Common/ToolTip";
 
 export default class Status extends PureComponent {
     static propTypes = {
-        length: PropTypes.number.isRequired,
         isActive: PropTypes.bool.isRequired,
         onClick: PropTypes.func,
         onMouseEnter: PropTypes.func,
@@ -23,13 +17,16 @@ export default class Status extends PureComponent {
     };
 
     render() {
-        const {length, isActive, onClick, onMouseEnter, onMouseLeave} = this.props;
-        const status = length <= 2 ? STATUS.GOOD : length <= 5 ? STATUS.OK : STATUS.BUSY;
+        const {isActive, onClick, onMouseEnter, onMouseLeave} = this.props;
         return (
-            <div className={cs('status', status, {'is-active': isActive})}
+            <div className={cs('status', {'is-active': isActive})}
                  onMouseEnter={onMouseEnter}
                  onMouseLeave={onMouseLeave}
-                 onClick={onClick}/>
+                 onClick={onClick}>
+                <ToolTip title={'设置'}>
+                    <i className={`iconfont icon-setting`}/>
+                </ToolTip>
+            </div>
         )
     }
 }

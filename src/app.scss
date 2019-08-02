@@ -16,10 +16,14 @@
     overflow: hidden;
     box-shadow: 0 0 10px rgba(0, 0, 0, .9);
     transition: box-shadow .3s ease-in-out;
-    &.is-small {
+    &.is-extensions {
         height: 100%;
         margin: auto;
         box-shadow: none;
+    }
+    &.is-electron {
+        height: calc(100% - 8px);
+        margin:4px auto;
     }
     &::before {
         content: '';

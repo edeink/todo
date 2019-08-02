@@ -254,7 +254,7 @@ class App extends PureComponent {
         const {categoryKey} = this.state;
         const preData = this.state[storeKey];
         const newData = [...preData];
-        newData.splice(index, 1);
+        const deleteData = newData.splice(index, 1);
         const realStoreKey = getRealStoreKey(categoryKey, storeKey);
         store.setItem(realStoreKey, stringify(newData));
         if (enableAnimate !== true) {
@@ -262,9 +262,52 @@ class App extends PureComponent {
         }
         this.setState({
             [storeKey]: newData
+        }, () => {
+            this._checkTagExist(deleteData[0]);
         });
     };
 
+    // 更新tags后需要确认之前的Tag是否存在
+    _checkTagExist(deleteData) {
+        let deleteDataTag = deleteData[RENDER_TAGS_KEY];
+        // 没有Tag，不需要确认
+        if (!deleteDataTag.length) {
+            return;
+        }
+        const todoData = this.state[STORE_TODO_KEY];
+        const doneData = this.state[STORE_DONE_KEY];
+        const {tags: allTag} = this.state;
+        let newTags = new Set(allTag);
+        let tags = [...deleteDataTag];
+        let deleteTag = [];
+        let isNotChange = tags.every(function (eachTag) {
+            let find = todoData.some(function(eachTodoData) {
+                return eachTodoData[RENDER_TAGS_KEY].has(eachTag);
+            });
+            // 提前结束
+            if (find) {
+                return find;
+            } else {
+                find = doneData.some(function(eachDoneData) {
+                    return eachDoneData[RENDER_TAGS_KEY].has(eachTag);
+                });
+                if (!find) {
+                    deleteTag.push(eachTag);
+                }
+                return find;
+            }
+        });
+        if (isNotChange === false) {
+            deleteTag.forEach(function (eachDelTag) {
+                newTags.delete(eachDelTag);
+            });
+            this.setState({
+                tags: Array.from(newTags)
+            });
+        }
+    }
+
+    // 拖拽数据
     dragData = (listData, storeKey) => {
         const {categoryKey} = this.state;
         this.setState({
@@ -274,6 +317,7 @@ class App extends PureComponent {
         store.setItem(realStoreKey, stringify(listData));
     };
 
+    // 插入新的Tag
     onInsertTag = (tag) => {
         const {insertValue} = this.state;
         // 不重复才添加
@@ -294,7 +338,7 @@ class App extends PureComponent {
 
     onDragStart = () => {
         document.activeElement && document.activeElement.blur();
-    }
+    };
 
     onDragEnd = (result) => {
         const {source, destination} = result;
@@ -449,16 +493,20 @@ class App extends PureComponent {
         } = this.state;
         const todoData = this.state[STORE_TODO_KEY];
         const doneData = this.state[STORE_DONE_KEY];
-        const isSmall = document.querySelector('#root').clientWidth <= 310;
+        let root = document.querySelector('#root');
+        // 根据布局属性做判断
+        const isElectron = root.clientWidth === 320;
+        const isChromeExtension = root.clientWidth === 310;
         return (
             <DragDropContext onDragEnd={this.onDragEnd} onDragStart={this.onDragStart}>
                 <div id="todo-app" className={cs(`theme-${theme}`,
-                    {'is-small': isSmall}, {'is-win': isWindows})} tabIndex="0">
+                    {'is-electron': isElectron, 'is-extensions': isChromeExtension, 'is-win': isWindows})}
+                     tabIndex="0">
                     <div className={cs('app-wrapper', {'open-tool': openTool})}>
                         {/* 其它提示 */}
                         <Tip/>
                         {/* 当前状态栏 */}
-                        <Status length={todoData.length} onClick={this.handleToggleTool}
+                        <Status onClick={this.handleToggleTool}
                                 isActive={openTool}/>
                         {/* 列表 */}
                         <div className={cs('list-container', {'focus': focus})}>

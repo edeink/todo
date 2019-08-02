@@ -83,9 +83,9 @@ function createWindow() {
                         win.show();
                         win.setAlwaysOnTop(true);
                         trayMenu[0].label = '隐藏';
-                        trayMenu[1].submenu[0].checked = true;
-                        trayMenu[1].submenu[1].checked = false;
-                        trayMenu[1].submenu[2].checked = false;
+                        trayMenu[2].submenu[0].checked = true;
+                        trayMenu[2].submenu[1].checked = false;
+                        // trayMenu[2].submenu[2].checked = false;
                         trayUpdate(trayMenu);
                     }
                 },
@@ -94,23 +94,23 @@ function createWindow() {
                         win.show();
                         win.setAlwaysOnTop(false);
                         trayMenu[0].label = '隐藏';
-                        trayMenu[1].submenu[0].checked = false;
-                        trayMenu[1].submenu[1].checked = true;
-                        trayMenu[1].submenu[2].checked = false;
+                        trayMenu[2].submenu[0].checked = false;
+                        trayMenu[2].submenu[1].checked = true;
+                        // trayMenu[2].submenu[2].checked = false;
                         trayUpdate(trayMenu);
                     }
                 },
-                {
-                    label: '依附在桌面', type: MENU_TYPE.RADIO, click: function () {
-                        win.show();
-                        win.setAlwaysOnTop(false, -1);
-                        trayMenu[0].label = '隐藏';
-                        trayMenu[1].submenu[0].checked = false;
-                        trayMenu[1].submenu[1].checked = false;
-                        trayMenu[1].submenu[2].checked = true;
-                        trayUpdate(trayMenu);
-                    }
-                }
+                // {
+                //     label: '依附在桌面', type: MENU_TYPE.RADIO, click: function () {
+                //         win.show();
+                //         win.setAlwaysOnTop(false, -1);
+                //         trayMenu[0].label = '隐藏';
+                //         trayMenu[2].submenu[0].checked = false;
+                //         trayMenu[2].submenu[1].checked = false;
+                //         trayMenu[2].submenu[2].checked = true;
+                //         trayUpdate(trayMenu);
+                //     }
+                // }
             ]
         },
         {
@@ -131,9 +131,13 @@ function createWindow() {
             label: '', type: MENU_TYPE.SEPARATOR
         },
         {
-            label: '退出', type: MENU_TYPE.BUTTON, click: function () {
-                win.close();
-            }
+            label: '退出', type: MENU_TYPE.BUTTON, click: function (event) {
+                // event存在，代表菜单点击
+                if (event || win.isFocused()) {
+                    win.close();
+                }
+            },
+            accelerator: 'Esc',
         },
     ];
 
@@ -149,15 +153,20 @@ function createWindow() {
     }
     function maxOrMin() {
         if (!isMax) {
-            win.setSize(winWidth, screenHeight);
-            win.setPosition(parseInt(screenWidth - winWidth), 0);
+            if (isWin) {
+                win.setSize(winWidth, screenHeight - 100);
+                win.setPosition(parseInt(screenWidth - winWidth), 100);
+            } else {
+                win.setSize(winWidth, screenHeight);
+                win.setPosition(parseInt(screenWidth - winWidth), 0);
+            }
             trayMenu[1].label = '收起';
-
         } else {
+            win.setResizable(true);
             win.setSize(winWidth, winHeight);
             win.setPosition(initX, initY);
             trayMenu[1].label = '展开';
-            isMax = true;
+            win.setResizable(false);
         }
         isMax = !isMax;
         trayUpdate(trayMenu);
@@ -185,10 +194,6 @@ function createWindow() {
            globalShortcut.register(eachTray.accelerator, eachTray.click);
        }
     });
-
-    // 系统通知
-    app.setAppUserModelId("todo.edeity.me"); // set appId from package.json
-    // autoUpdater.checkForUpdatesAndNotify();
 
     // 关闭注销
     win.on('closed', function () {

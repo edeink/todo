@@ -37,6 +37,7 @@
     "deploy": "gh-pages -d build"
   },
   "build": {
+    "appId": "todo.edeity.me",
     "mac": {
       "category": "public.app-category.developer-tools",
       "icon": "favicon.ico"
