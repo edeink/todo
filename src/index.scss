@@ -1,13 +1,15 @@
 * {
     box-sizing: border-box;
 }
+
 body {
     // body需要告知chrome插件，所以不能100%
     width: 310px;
     height: 300px;
     margin: 0;
-    font-family: tahoma,arial,'Hiragino Sans GB','\5b8b\4f53',sans-serif;
+    font-family: tahoma, arial, 'Hiragino Sans GB', '\5b8b\4f53', sans-serif;
 }
+
 #root {
     width: 100vw;
     height: 100vh;

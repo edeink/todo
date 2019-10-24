@@ -1,20 +1,24 @@
 .tags {
-  display: inline-block;
-  .tag {
-    padding: 2px 4px;
-    margin: 2px;
-    background: rgba(255, 255, 255, .2);
-    border-radius: 2px;
-    font-size: 12px;
-    &:first-child {
-      margin-left: 0;
-    }
-  }
-  &.small {
-    margin-left: 2px;
+    display: inline-block;
+
     .tag {
-      padding: 2px 4px;
-      transform: scale(.8);
+        padding: 2px 4px;
+        margin: 2px;
+        background: rgba(255, 255, 255, .2);
+        border-radius: 2px;
+        font-size: 12px;
+
+        &:first-child {
+            margin-left: 0;
+        }
     }
-  }
+
+    &.small {
+        margin-left: 2px;
+
+        .tag {
+            padding: 2px 4px;
+            transform: scale(.8);
+        }
+    }
 }

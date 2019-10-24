@@ -3,138 +3,181 @@ $sec-color: #767C85;
 $normal-color: #AEB5C0;
 
 #todo-app.theme-white {
-  color: $base-color;
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
-  // 背景色
-  &::before {
-    background: rgba(255, 255, 255, .9);
-  }
-  // 工具栏
-  .status {
-    &:before {
-      background: rgba(0, 0, 0, .05);
-    }
-  }
-  // 提示
-  .tips {
     color: $base-color;
-    background: rgba(0, 0, 0, .05);
-  }
-  .done-split {
-    background: #e1e1e1;
-  }
-  // 列表
-  .list {
-    li {
-      transition: background-color .2s linear;
-      &:hover {
-        background: rgba(0, 0, 0, .1);
-      }
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.2);
+    // 背景色
+    &::before {
+        background: rgba(255, 255, 255, .9);
     }
-    .checkbox {
-      border: 1px solid $base-color;
-      &:hover {
-        background: rgba(0, 0, 0, .05);
-      }
-      &:after {
-        border-color: $base-color;
-      }
+
+    // 工具栏
+    .status {
+        &:before {
+            background: rgba(0, 0, 0, .05);
+        }
     }
-  }
-  .message {
-    color: $base-color;
-    .tag {
-      background: rgba(0, 0, 0, .1);
-    }
-    .time {
-      color: $sec-color;
-    }
-    .hyperlink button {
-      color: $sec-color;
-      border-bottom: 1px solid rgba(0, 0, 0, .3);
-    }
-    .delete {
-      color: $base-color;
-    }
-  }
-  // 预览
-  .input-li.undo-li {
-    color: rgba(0, 0, 0, .2);
-  }
-  // 类别
-  .todo-category ul li {
-    color: $sec-color;
-    &.is-active {
-      color: $base-color;
-      background: rgba(0, 0, 0, .1);
-    }
-    &.is-focus {
-      background-color: transparent;
-    }
-    .category-input {
-      display: inline-block;
-      background: #fafafa;
-      border: 1px solid rgba(0, 0, 0, .6);
-    }
-  }
-  // 关闭按钮
-  button.cross {
-    &:hover {
-      background: rgba(255, 255, 255, .8);
-    }
-    &:before {
-      background: $sec-color;
-    }
-    &:after {
-      background: $sec-color;
-    }
-  }
-  // 输入框
-  .input-wrapper {
-    &.focus {
-      input {
-        background: rgba(0, 0, 0, .05);
-        box-shadow: 0 -1px 10px 2px rgba(0, 0, 0, .05);
-        border-bottom: 1px solid $base-color;
-      }
-    }
-    input {
-      color: $base-color;
-      border-bottom: 1px solid black;
-    }
-  }
-  ::-webkit-scrollbar-thumb {
-    border: 2px solid rgba(0, 0, 0, .15);
-  }
-  // 确认
-  .confirm {
-    background: white;
-    .title {
-      color: $base-color;
-    }
-    button {
-      &:hover {
-        background: rgba(0, 0, 0, .05);
-      }
-      &:active {
-        background: rgba(0, 0, 0, .1);
-      }
-    }
-  }
-  .filter-tag-list {
-    .filter-tag {
-      border: 1px solid white;
-      background: white;
-      cursor: pointer;
-      &:hover {
-        background: rgba(0, 0, 0, .05);
-      }
-      &.is-active {
-        border: 1px solid #efefef;
+
+    // 提示
+    .tips {
         color: $base-color;
-        background: rgba(0, 0, 0, .05);;
-        opacity: 1;
-      }
+        background: rgba(0, 0, 0, .05);
     }
-  }
+
+    .done-split {
+        background: #e1e1e1;
+    }
+
+    // 列表
+    .list {
+        li {
+            transition: background-color .2s linear;
+
+            &:hover {
+                background: rgba(0, 0, 0, .1);
+            }
+        }
+
+        .checkbox {
+            border: 1px solid $base-color;
+
+            &:hover {
+                background: rgba(0, 0, 0, .05);
+            }
+
+            &:after {
+                border-color: $base-color;
+            }
+        }
+    }
+
+    .message {
+        color: $base-color;
+
+        .tag {
+            background: rgba(0, 0, 0, .1);
+        }
+
+        .time {
+            color: $sec-color;
+        }
+
+        .hyperlink button {
+            color: $sec-color;
+            border-bottom: 1px solid rgba(0, 0, 0, .3);
+        }
+
+        .delete {
+            color: $base-color;
+        }
+    }
+
+    // 预览
+    .input-li.undo-li {
+        color: rgba(0, 0, 0, .2);
+    }
+
+    // 类别
+    .todo-category ul li {
+        color: $sec-color;
+
+        &.is-active {
+            color: $base-color;
+            background: rgba(0, 0, 0, .1);
+        }
+
+        &.is-focus {
+            background-color: transparent;
+        }
+
+        .category-input {
+            display: inline-block;
+            background: #fafafa;
+            border: 1px solid rgba(0, 0, 0, .6);
+        }
+    }
+
+    // 关闭按钮
+    button.cross {
+        &:hover {
+            background: rgba(255, 255, 255, .8);
+        }
+
+        &:before {
+            background: $sec-color;
+        }
+
+        &:after {
+            background: $sec-color;
+        }
+    }
+
+    // 输入框
+    .input-wrapper {
+        &.focus {
+            input {
+                background: rgba(0, 0, 0, .05);
+                box-shadow: 0 -1px 10px 2px rgba(0, 0, 0, .05);
+                border-bottom: 1px solid $base-color;
+            }
+        }
+
+        input {
+            color: $base-color;
+            border-bottom: 1px solid black;
+        }
+    }
+
+    ::-webkit-scrollbar-thumb {
+        border: 2px solid rgba(0, 0, 0, .15);
+    }
+
+    // 确认
+    .confirm {
+        background: white;
+
+        .title {
+            color: $base-color;
+        }
+
+        button {
+            &:hover {
+                background: rgba(0, 0, 0, .05);
+            }
+
+            &:active {
+                background: rgba(0, 0, 0, .1);
+            }
+        }
+    }
+
+    .filter-tag-list {
+        .filter-tag {
+            border: 1px solid white;
+            background: white;
+            cursor: pointer;
+
+            &:hover {
+                background: rgba(0, 0, 0, .05);
+            }
+
+            &.is-active {
+                border: 1px solid #efefef;
+                color: $base-color;
+                background: rgba(0, 0, 0, .05);;
+                opacity: 1;
+            }
+        }
+    }
+
+    .category-delete {
+        padding: 8px;
+        border-radius: 4px;
+        font-size: 14px;
+        text-align: center;
+        cursor: pointer;
+
+        &:hover {
+            background: rgba(0, 0, 0, .05);
+        }
+    }
 }

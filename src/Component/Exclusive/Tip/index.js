@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import cs from 'classnames';
 
@@ -69,7 +69,7 @@ export default class Tip extends PureComponent {
             tip, active: true
         });
         this.tipsTimout = setTimeout(() => {
-            this.setState({ active: false });
+            this.setState({active: false});
         }, timeout || duration || 2000);
     };
 
@@ -79,7 +79,7 @@ export default class Tip extends PureComponent {
             return null;
         }
         return (
-            <div className={cs("tips", { "is-active": active })}>{`${tip}`}</div>
+            <div className={cs("tips", {"is-active": active})}>{`${tip}`}</div>
         )
     }
 }

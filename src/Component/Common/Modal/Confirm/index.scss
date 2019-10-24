@@ -1,52 +1,59 @@
 .confirm {
-  position: absolute;
-  top: 0;
-  left: 0;
-  bottom: 0;
-  right: 0;
-  width: 200px;
-  height: 80px;
-  margin: auto;
-  border: 1px solid rgba(255, 255, 255, .6);
-  border-radius: 4px;
-  background: black;
-  font-size: 0;
-  .title {
-    color: white;
-    padding: 12px;
-    font-size: 14px;
-  }
-  .btn-group {
     position: absolute;
-    bottom: 4px;
-    right: 4px;
-    float: right;
-    button {
-      display: inline-block;
-      background: white;
-      margin: 2px;
-      border: none;
-      border-radius: 2px;
-      background: rgba(255, 255, 255, .9);
-      outline: none;
-      cursor: pointer;
-      &:hover {
-        background: rgba(255, 255, 255, .95);
-      }
-      &:active {
-        background: rgba(255, 255, 255, 1);
-      }
-      &.yes {
-        font-weight: bold;
-      }
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    width: 200px;
+    min-height: 80px;
+    margin: auto;
+    border: 1px solid rgba(255, 255, 255, .6);
+    border-radius: 4px;
+    background: black;
+    font-size: 0;
+
+    .title {
+        color: white;
+        padding: 12px 24px 32px 12px;
+        font-size: 14px;
     }
-  }
-  button.cross.close-btn {
-    top: 4px;
-    right: 4px;
-    bottom: auto;
-  }
-  &.animated {
-    animation-duration: .4s;
-  }
+
+    .btn-group {
+        position: absolute;
+        bottom: 4px;
+        right: 4px;
+        float: right;
+
+        button {
+            display: inline-block;
+            background: white;
+            margin: 2px;
+            border: none;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, .9);
+            outline: none;
+            cursor: pointer;
+
+            &:hover {
+                background: rgba(255, 255, 255, .95);
+            }
+
+            &:active {
+                background: rgba(255, 255, 255, 1);
+            }
+
+            &.yes {
+                font-weight: bold;
+            }
+        }
+    }
+
+    button.cross.close-btn {
+        top: 4px;
+        right: 4px;
+        bottom: auto;
+    }
+
+    &.animated {
+        animation-duration: .4s;
+    }
 }

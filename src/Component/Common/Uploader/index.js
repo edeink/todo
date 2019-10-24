@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import fileHelper from "../../../tool/file";
 
@@ -29,10 +29,10 @@ export default class Uploader extends PureComponent {
 
     handleRead = (event) => {
         const {type, onChange} = this.props;
-        switch(type) {
+        switch (type) {
             case ACCEPT_TYPE.JSON: {
                 fileHelper.readJson(event).then(function (data) {
-                   onChange(data);
+                    onChange(data);
                 });
                 break;
             }
@@ -54,7 +54,7 @@ export default class Uploader extends PureComponent {
                  onClick={this.handleClick}>
                 <input ref={comp => this.refInput = comp}
                        className="read" type="file" onChange={this.handleRead}/>
-                { children }
+                {children}
             </div>
         )
     }

@@ -5,7 +5,7 @@ const {RENDER_ACTIVE_KEY, RENDER_STRING_KEY, RENDER_TIME_KEY} = TODO_CONFIG;
 
 // 该方法只针对列表数据，用以过滤不必要的数据
 const stringify = function (array) {
-    if(array.length === 0) {
+    if (array.length === 0) {
         return '[]'
     } else {
         let newArray = [];
@@ -20,12 +20,12 @@ const stringify = function (array) {
             }
             newArray.push(tempData);
         });
-        return JSON.stringify(newArray) ;
+        return JSON.stringify(newArray);
     }
 };
 
 // 一个包含错误处理的parse
-const parse = function(value, defaultValue) {
+const parse = function (value, defaultValue) {
     let data = null;
     try {
         data = JSON.parse(value);

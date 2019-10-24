@@ -1,7 +1,7 @@
 const TODO_CONFIG = {
     LIMIT_WORDS: 100, // 允许输入的字
     // 默认分类
-    CATEGORY_LIST : [
+    CATEGORY_LIST: [
         {key: 'default', value: '默认'},
         // {key: 'work', value: '工作'},
         // {key: 'home', value: '家庭'},

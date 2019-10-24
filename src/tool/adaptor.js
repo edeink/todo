@@ -9,7 +9,7 @@ const notify = (title, body) => {
 // 跳转URL
 const goToUrl = (url, errCb) => {
     try {
-        const { shell } = window.require('electron');
+        const {shell} = window.require('electron');
         shell.openExternal(url);
     } catch (e) {
         try {

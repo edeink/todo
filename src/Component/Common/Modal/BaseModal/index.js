@@ -6,12 +6,14 @@ import './index.scss';
 let popup = null;
 let appendAnchor = null;
 
+// 获取最外层的容器div
 const createContainer = () => {
     const div = document.createElement('div');
     div.className = 'modal';
     return div;
 };
 
+// 获取依附在上面的div
 const getAnchor = () => {
     if (appendAnchor) {
         return appendAnchor;
@@ -56,9 +58,12 @@ export default class BaseModal extends Component {
                 props.show = null;
 
                 ReactDOM.render(
-                    <div className="mask">
-                        {React.cloneElement(children, props)}
-                    </div>, popup
+                    <React.Fragment>
+                        <div className="mask"/>
+                        <div className="container animated bounceIn">
+                            {children}
+                        </div>
+                    </React.Fragment>, popup
                 );
             }
             return true;

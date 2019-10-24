@@ -125,7 +125,7 @@ export default class UndoLi extends PureComponent {
             )
         } else {
             return (
-                <li className={cs("li undo-li", className, {"checked": checked,  "hidden": isMatch === false})}>
+                <li className={cs("li undo-li", className, {"checked": checked, "hidden": isMatch === false})}>
                     {
                         onSelect &&
                         <Checkbox

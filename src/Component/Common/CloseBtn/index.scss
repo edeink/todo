@@ -15,10 +15,12 @@ button.cross {
     // background: rgba(255, 255, 255, .1);
     transition: background-color .3s ease-in-out, opacity .3s ease-in-out;
     cursor: pointer;
+
     &:hover {
         opacity: 1;
         background: rgba(255, 255, 255, .15);
     }
+
     &:before {
         content: '';
         position: absolute;
@@ -29,6 +31,7 @@ button.cross {
         height: 2px;
         background: rgba(255, 255, 255, 0.8);
     }
+
     &:after {
         content: '';
         position: absolute;
@@ -39,9 +42,11 @@ button.cross {
         height: 10px;
         background: rgba(255, 255, 255, 0.8);
     }
+
     &.close-btn {
         transform: rotate(45deg);
     }
+
     &.hidden {
         opacity: 0;
     }

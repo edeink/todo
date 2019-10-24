@@ -115,7 +115,7 @@ const parser = {
         const summaryInfo = explain.getSummaryInfo(collection);
         collection[0] = Object.assign(collection[0], summaryInfo);
 
-        if(closeTips !== true) {
+        if (closeTips !== true) {
             // console.log(`执行解析数据: ${txt}`);
             console.log(`txt: ${txt}, parseData:`, collection);
         }
@@ -446,9 +446,9 @@ const explain = {
         // 分析delay
         if (delay) {
             let unit = null;
-            for(let i = 0; i<delay.length; i++) {
+            for (let i = 0; i < delay.length; i++) {
                 let tempChar = delay[i];
-                if(Number.isNaN(parseInt(tempChar))) {
+                if (Number.isNaN(parseInt(tempChar))) {
                     unit = tempChar;
                     i = delay.length;
                 }
@@ -515,21 +515,28 @@ const explain = {
         return time;
     },
     getChineseDay(clock) {
-        switch(clock) {
+        switch (clock) {
             case '星期一':
-            case '周一': return 1;
+            case '周一':
+                return 1;
             case '星期二':
-            case '周二': return 2;
+            case '周二':
+                return 2;
             case '星期三':
-            case '周三': return 3;
+            case '周三':
+                return 3;
             case '星期四':
-            case '周四': return 4;
+            case '周四':
+                return 4;
             case '星期五':
-            case '周五': return 5;
+            case '周五':
+                return 5;
             case '星期六':
-            case '周六': return 6;
+            case '周六':
+                return 6;
             case '星期天':
-            case '周日': return 7;
+            case '周日':
+                return 7;
             default:
                 return undefined;
         }
@@ -544,7 +551,7 @@ const explain = {
             let eachData = eachBlock.data;
             if (eachBlock.key === TOKEN_TYPE.TIME) {
                 tempInfo[RENDER_TIME_KEY] = eachBlock.data.timeStamp;
-            } else if(eachBlock.key === TOKEN_TYPE.TAG && eachBlock.data && eachBlock.data.value) {
+            } else if (eachBlock.key === TOKEN_TYPE.TAG && eachBlock.data && eachBlock.data.value) {
                 tempInfo[RENDER_TAGS_KEY].add(eachBlock.data.value);
             } else {
                 if (eachData && eachData.value) {

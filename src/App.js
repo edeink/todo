@@ -1,7 +1,7 @@
 import React, {PureComponent} from 'react';
 import cs from 'classnames';
 import {DragDropContext} from "react-beautiful-dnd";
-import Category from './Component/Exclusive/Category';
+import Category, {DeleteEmptyCategory} from './Component/Exclusive/Category';
 import Tip from './Component/Exclusive/Tip';
 import Status from './Component/Exclusive/Status';
 import Input from './Component/Exclusive/Input';
@@ -57,7 +57,7 @@ class App extends PureComponent {
         [STORE_DONE_KEY]: [], // 已经完成的消息
         focus: false, // input是否focus
         category: CATEGORY_LIST, // 总分类
-        categoryKey: INIT_CATEGORY_KEY, // 当前激活的分类
+        activeCategoryKey: INIT_CATEGORY_KEY, // 当前激活的分类
         openTool: false, // 打开工具栏
         enableAnimate: false, // 禁用动画
         theme: ColorTheme.getTheme(), // THEME.DEFAULT,
@@ -95,11 +95,11 @@ class App extends PureComponent {
             console.time(TIME_KEY.ALL_DATA_READ_AND_RENDER);
             const category = parse(store.getItem(STORE_CATEGORY_KEY), CATEGORY_LIST);
             store.setItem(STORE_CATEGORY_KEY, JSON.stringify(category));
-            const categoryKey = store.getItem(STORE_ACTIVE_CATEGORY_KEY) || category[0].key;
+            const activeCategoryKey = store.getItem(STORE_ACTIVE_CATEGORY_KEY) || category[0].key;
             console.time(TIME_KEY.ALL_LIST_READ_AND_RENDER);
             this.setState({
                 category,
-                categoryKey,
+                activeCategoryKey,
                 openTool: false,
             }, () => {
                 this._readList().then(() => {
@@ -114,10 +114,10 @@ class App extends PureComponent {
     // 读取每列数据
     _readList = () => {
         return new Promise((resolve) => {
-            const {categoryKey} = this.state;
+            const {activeCategoryKey} = this.state;
             const newTags = new Set();
             LIST_KEYS.forEach((eachKey) => {
-                const storeKey = getRealStoreKey(categoryKey, eachKey);
+                const storeKey = getRealStoreKey(activeCategoryKey, eachKey);
                 const tempData = parse(store.getItem(storeKey), []);
                 tempData.forEach(function (eachData) {
                     if (!eachData[RENDER_PARSE_KEY]) {
@@ -150,7 +150,7 @@ class App extends PureComponent {
             return false;
         }
 
-        const {categoryKey, tags} = this.state;
+        const {activeCategoryKey, tags} = this.state;
         const preData = this.state[storeKey];
 
         // 解析该行命令
@@ -199,7 +199,7 @@ class App extends PureComponent {
         data[RENDER_TAGS_KEY].forEach(function (tag) {
             newTags.add(tag);
         });
-        const realStoreKey = getRealStoreKey(categoryKey, storeKey);
+        const realStoreKey = getRealStoreKey(activeCategoryKey, storeKey);
         store.setItem(realStoreKey, stringify(newData));
         this.setState({
             [storeKey]: newData,
@@ -245,11 +245,11 @@ class App extends PureComponent {
             });
             return false;
         }
-        const {categoryKey} = this.state;
+        const {activeCategoryKey} = this.state;
         const preData = this.state[storeKey];
         const newData = [...preData];
         const deleteData = newData.splice(index, 1);
-        const realStoreKey = getRealStoreKey(categoryKey, storeKey);
+        const realStoreKey = getRealStoreKey(activeCategoryKey, storeKey);
         store.setItem(realStoreKey, stringify(newData));
         if (enableAnimate !== true) {
             this.brieflyCloseAnimate();
@@ -275,14 +275,14 @@ class App extends PureComponent {
         let tags = [...deleteDataTag];
         let deleteTag = [];
         let isNotChange = tags.every(function (eachTag) {
-            let find = todoData.some(function(eachTodoData) {
+            let find = todoData.some(function (eachTodoData) {
                 return eachTodoData[RENDER_TAGS_KEY].has(eachTag);
             });
             // 提前结束
             if (find) {
                 return find;
             } else {
-                find = doneData.some(function(eachDoneData) {
+                find = doneData.some(function (eachDoneData) {
                     return eachDoneData[RENDER_TAGS_KEY].has(eachTag);
                 });
                 if (!find) {
@@ -303,11 +303,11 @@ class App extends PureComponent {
 
     // 拖拽数据
     dragData = (listData, storeKey) => {
-        const {categoryKey} = this.state;
+        const {activeCategoryKey} = this.state;
         this.setState({
             [storeKey]: [...listData]
         });
-        const realStoreKey = getRealStoreKey(categoryKey, storeKey);
+        const realStoreKey = getRealStoreKey(activeCategoryKey, storeKey);
         store.setItem(realStoreKey, stringify(listData));
     };
 
@@ -363,13 +363,14 @@ class App extends PureComponent {
             }
             case DROP_TYPE.INPUT: {
                 this.setState({
-                   insertValue: sourceMsg.value
+                    insertValue: sourceMsg.value
                 }, () => {
                     this.deleteOneData(sourceIndex, STORE_TODO_KEY, false);
                 });
                 break;
             }
-            default: break;
+            default:
+                break;
         }
     };
     /**
@@ -411,9 +412,42 @@ class App extends PureComponent {
             })
         }, 100);
     };
-    changeCategory = (key) => {
+    // 删除当前页签内容
+    deleteCategory = (matchIndex) => {
+        const {category, activeCategoryKey} = this.state;
+        if (!matchIndex) {
+            category.some(function (keyValue, currIndex) {
+                const {key} = keyValue;
+                if (key === activeCategoryKey) {
+                    matchIndex = currIndex;
+                    return true;
+                }
+                return false;
+            });
+        }
+        // 删除页签
+        category.splice(matchIndex, 1);
         this.setState({
-            categoryKey: key,
+            category: [...category],
+        });
+
+        // 重置新的默认页签
+        let newActiveCategory = matchIndex - 1 || 0;
+        let newActiveKey = category[newActiveCategory].key;
+        this.activeCategory(newActiveKey);
+
+        store.setItem(STORE_CATEGORY_KEY, JSON.stringify(category));
+    };
+    // 更改页签内容
+    changeCategory = (category) => {
+        this.setState({
+            category: category
+        });
+    };
+    // 更改激活的页签
+    activeCategory = (key) => {
+        this.setState({
+            activeCategoryKey: key,
         }, () => {
             store.setItem(STORE_ACTIVE_CATEGORY_KEY, key);
             this._readList();
@@ -480,7 +514,7 @@ class App extends PureComponent {
 
     render() {
         const {
-            focus, category, categoryKey, openTool,
+            focus, category, activeCategoryKey, openTool,
             enableAnimate, theme,
             insertValue, confirmVisible, confirmText,
             tags, filterTag,
@@ -491,6 +525,7 @@ class App extends PureComponent {
         // 根据布局属性做判断
         const isElectron = root.clientWidth === 320;
         const isChromeExtension = root.clientWidth === 310;
+        const isEmpty = activeCategoryKey && todoData.length === 0 && doneData.length === 0;
         return (
             <DragDropContext onDragEnd={this.onDragEnd} onDragStart={this.onDragStart}>
                 <div id="todo-app" className={cs(`theme-${theme}`,
@@ -505,40 +540,49 @@ class App extends PureComponent {
                         {/* 列表 */}
                         <div className={cs('list-container', {'focus': focus})}>
                             <FilterTags tags={tags} onChange={this.changeFilter}/>
-                            <UndoList
-                                id={DROP_TYPE.TODO}
-                                storeKey={STORE_TODO_KEY}
-                                className={cs('undo-list')}
-                                list={todoData}
-                                checked={false}
-                                filterTag={filterTag}
-                                placeholder={"不来一发吗?"}
-                                transitionEnter={enableAnimate}
-                                draggable={true}
-                                onSelect={this.toggleOneData}
-                                onDelete={this.deleteOneData}
-                                onActive={this.handleActive}
-                                onInsertTag={this.onInsertTag}/>
                             {
-                                doneData.length > 0 &&
-                                <div className="done-split"/>
+                                isEmpty ?
+                                    <DeleteEmptyCategory onClick={this.deleteCategory}/> :
+                                    <React.Fragment>
+                                        <UndoList
+                                            id={DROP_TYPE.TODO}
+                                            storeKey={STORE_TODO_KEY}
+                                            className={cs('undo-list')}
+                                            list={todoData}
+                                            checked={false}
+                                            filterTag={filterTag}
+                                            placeholder={"不来一发吗?"}
+                                            transitionEnter={enableAnimate}
+                                            draggable={true}
+                                            onSelect={this.toggleOneData}
+                                            onDelete={this.deleteOneData}
+                                            onActive={this.handleActive}
+                                            onInsertTag={this.onInsertTag}/>
+                                        {
+                                            doneData.length > 0 &&
+                                            <div className="done-split"/>
+                                        }
+                                        <UndoList
+                                            id={DROP_TYPE.DONE}
+                                            storeKey={STORE_DONE_KEY}
+                                            className={cs('done-list')}
+                                            checked small
+                                            filterTag={filterTag}
+                                            list={doneData}
+                                            transitionEnter={false}
+                                            onSelect={this.toggleOneData}
+                                            onDelete={this.deleteOneData}
+                                            onInsertTag={this.onInsertTag}/>
+                                    </React.Fragment>
                             }
-                            <UndoList
-                                id={DROP_TYPE.DONE}
-                                storeKey={STORE_DONE_KEY}
-                                className={cs('done-list')}
-                                checked small
-                                filterTag={filterTag}
-                                list={doneData}
-                                transitionEnter={false}
-                                onSelect={this.toggleOneData}
-                                onDelete={this.deleteOneData}
-                                onInsertTag={this.onInsertTag}/>
                         </div>
                         {/* 分类 */}
-                        <Category activeKey={categoryKey}
-                                  options={category}
-                                  onChange={this.changeCategory}/>
+                        <Category
+                            activeKey={activeCategoryKey}
+                            options={category}
+                            onChange={this.changeCategory}
+                            onActive={this.activeCategory}
+                            onDelete={this.deleteCategory}/>
                         {/* 输入框 */}
                         <Input
                             id={DROP_TYPE.INPUT}

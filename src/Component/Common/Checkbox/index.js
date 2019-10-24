@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import cs from 'classnames';
 import './index.scss';
@@ -17,11 +17,12 @@ export default class Checkbox extends PureComponent {
         const {onChange, checked} = this.props;
         onChange && onChange(!checked);
     };
+
     render() {
         const {checked, small} = this.props;
         return (
-            <div className={cs("checkbox", {'checked': checked, 'small': small})} 
-                onClick={this.toggleChecked}/>
+            <div className={cs("checkbox", {'checked': checked, 'small': small})}
+                 onClick={this.toggleChecked}/>
         )
     }
 }

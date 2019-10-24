@@ -5,6 +5,7 @@
     border-radius: 12px;
     transition: background-color .3s ease-in-out;
     cursor: pointer;
+
     &:before {
         content: '';
         position: absolute;
@@ -21,6 +22,7 @@
         opacity .2s ease-in, background-color .2s ease-in-out;
         z-index: -1;
     }
+
     &:hover {
         &:before {
             width: 50px;
@@ -29,16 +31,19 @@
 
         }
     }
+
     .icon-setting {
         position: relative;
         top: -6px;
         left: 2px;
         opacity: .4;
         transition: opacity .3s ease-in-out;
+
         &:hover {
             opacity: 1;
         }
     }
+
     &.is-active {
         &:before {
             width: 800px;

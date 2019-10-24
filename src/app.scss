@@ -16,15 +16,18 @@
     overflow: hidden;
     box-shadow: 0 0 10px rgba(0, 0, 0, .9);
     transition: box-shadow .3s ease-in-out;
+
     &.is-extensions {
         height: 100%;
         margin: auto;
         box-shadow: none;
     }
+
     &.is-electron {
         height: calc(100% - 8px);
-        margin:4px auto;
+        margin: 4px auto;
     }
+
     &::before {
         content: '';
         position: absolute;
@@ -37,13 +40,16 @@
         z-index: -1;
         transition: background-color .3s ease-in-out;
     }
+
     .app-wrapper {
         height: 100%;
         padding-top: 10px;
+
         &.open-tool {
             filter: blur(4px);
         }
     }
+
     .list-container {
         height: calc(100% - 30px);
         padding: 0 16px;
@@ -51,6 +57,7 @@
         overflow: auto;
         border-radius: 2px;
         -webkit-app-region: no-drag;
+
         .done-split {
             text-align: center;
             margin: 16px;
@@ -59,19 +66,24 @@
             background: rgba(255, 255, 255, 0.2);
             opacity: .4;
         }
+
         li {
             font-size: 14px;
+
             .message {
                 opacity: 1;
             }
+
             &.checked {
                 font-size: 12px;
                 text-decoration: line-through;
+
                 .message {
                     opacity: .5;
                 }
             }
         }
+
         &.focus {
             height: calc(100% - 60px);
         }
@@ -83,10 +95,12 @@
         ::-webkit-scrollbar {
             width: 4px;
         }
+
         ::-webkit-scrollbar-button {
             width: 0;
             height: 0;
         }
+
         ::-webkit-scrollbar-thumb {
             background-clip: padding-box;
             border: 2px solid rgba(255, 255, 255, .6);

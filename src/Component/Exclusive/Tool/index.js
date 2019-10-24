@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import cs from 'classnames';
 import './index.scss';
@@ -41,7 +41,7 @@ export default class Tool extends PureComponent {
         const {isActive, children, onClose} = this.props;
         return (
             <div className={cs('tool', {'is-active': isActive})}>
-                { isActive && children }
+                {isActive && children}
                 <CloseBtn onClick={onClose}/>
             </div>
         )

@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 // import cs from 'classnames';
 
@@ -29,7 +29,9 @@ export default class HyperLink extends PureComponent {
         return (
             <span className='hyperlink'>
                 <ToolTip title={data.link} direction="top">
-                    <button onClick={() => {this.jumpTo(data.link)}}>{data.value}</button>
+                    <button onClick={() => {
+                        this.jumpTo(data.link)
+                    }}>{data.value}</button>
                 </ToolTip>
             </span>
         )

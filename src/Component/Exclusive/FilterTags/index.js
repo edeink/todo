@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import cs from 'classnames';
 import './index.scss';
@@ -25,7 +25,7 @@ class Tag extends PureComponent {
     render() {
         const {title} = this.props;
         const {active} = this.state;
-        return(
+        return (
             <span className={cs('filter-tag', {'is-active': active})}
                   onClick={this.handleClick}>{title}</span>
         )

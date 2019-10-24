@@ -6,4 +6,4 @@ import './index.scss';
 import 'animate.css';
 import './theme/index.scss';
 
-ReactDOM.render(<App />, document.getElementById('root'));
+ReactDOM.render(<App/>, document.getElementById('root'));

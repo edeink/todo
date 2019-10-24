@@ -20,16 +20,16 @@ const fileHelper = {
             const reader = new FileReader();
             const files = event.target.files;
             reader.readAsText(files[0]);
-            reader.onload = function(res) {
+            reader.onload = function (res) {
                 const target = res.target;
                 if (target.readyState === 2) {
                     try {
                         let json = JSON.parse(target.result);
                         resolve(json);
-                    } catch(err) {
+                    } catch (err) {
                         reject(err);
                     }
-                  
+
                 }
             }
         });

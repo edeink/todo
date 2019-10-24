@@ -53,8 +53,8 @@ class ToolTipContent extends PureComponent {
         const height = parseInt(clientHeight);
         const rect = target.getBoundingClientRect();
         let margin = 10;
-        let left =  rect.left + rect.width / 2 - width / 2;
-        let top =  Math.max(y + margin, rect.bottom + margin);
+        let left = rect.left + rect.width / 2 - width / 2;
+        let top = Math.max(y + margin, rect.bottom + margin);
         let anchor = getAnchor();
         if (left + width > anchor.clientWidth) {
             left = (rect.left - rect.width / 2) - width;
@@ -96,7 +96,7 @@ export default class ToolTip extends PureComponent {
     handleMouseEnter = (e) => {
         const {pageX: x, pageY: y, currentTarget: target} = e;
         const {title} = this.props;
-        if(!title || title === '') {
+        if (!title || title === '') {
             return false;
         }
         if (!popup) {

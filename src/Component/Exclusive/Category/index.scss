@@ -8,10 +8,12 @@
     overflow: visible;
     opacity: .4;
     transition: opacity .3s ease-in-out;
+
     ul {
         width: 40px;
         padding: 0;
         overflow: visible;
+
         li {
             float: right;
             padding: 2px 6px 2px 4px;
@@ -24,23 +26,28 @@
             text-overflow: ellipsis;
             overflow: hidden;
             white-space: nowrap;
+
             &:hover {
                 background: rgba(255, 255, 255, .3);
             }
-            &.is-active  {
+
+            &.is-active {
                 right: 0;
                 color: #eee;
                 background: rgba(255, 255, 255, .2);
             }
+
             &.is-focus {
                 max-width: 200px;
                 background: rgba(255, 255, 255, 0);
             }
         }
     }
+
     &:hover {
         opacity: 1;
     }
+
     .category-input {
         padding: 4px 6px;
         border: 1px solid rgba(255, 255, 255, .7);
@@ -49,9 +56,26 @@
         outline: none;
         z-index: 2;
     }
+
     .add-category {
         right: 0;
         padding: 2px;
         list-style: none;
+    }
+}
+
+.category-delete {
+    padding: 8px;
+    margin: 0 12px;
+    border-radius: 4px;
+    font-size: 14px;
+    text-align: center;
+    cursor: pointer;
+    opacity: .4;
+    transition: background-color .3s, opacity .3s;
+
+    &:hover {
+        opacity: 1;
+        background: rgba(0, 0, 0, .2);
     }
 }

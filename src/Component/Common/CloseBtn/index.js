@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 import cs from 'classnames';
 import './index.scss';
@@ -14,10 +14,10 @@ export default class CloseBtn extends PureComponent {
     };
 
     render() {
-       const {className} = this.props;
+        const {className} = this.props;
         return (
             <button className={cs('cross', 'close-btn', className)}
-                    onClick={this.onClick} />
+                    onClick={this.onClick}/>
         )
     }
 }

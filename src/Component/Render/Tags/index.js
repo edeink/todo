@@ -1,4 +1,4 @@
-import React, { PureComponent } from 'react';
+import React, {PureComponent} from 'react';
 import PropTypes from 'prop-types';
 // import cs from 'classnames';
 import './index.scss';
@@ -16,7 +16,7 @@ export default class Tags extends PureComponent {
 
     render() {
         const {data} = this.props.data;
-        if(!data || !Array(data.tags) || data.tags.length === 0) {
+        if (!data || !Array(data.tags) || data.tags.length === 0) {
             return null;
         }
         return (
@@ -24,7 +24,9 @@ export default class Tags extends PureComponent {
                 {
                     data.tags.map((eachTag) => {
                         return <span className='tag' key={eachTag}
-                                     onDoubleClick={() => {this.onDoubleClick(eachTag)}}>{eachTag}</span>
+                                     onDoubleClick={() => {
+                                         this.onDoubleClick(eachTag)
+                                     }}>{eachTag}</span>
                     })
                 }
             </span>
