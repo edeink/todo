@@ -38,15 +38,11 @@ export default class Input extends PureComponent {
         onEnter: PropTypes.func,
     };
 
-    componentWillReceiveProps(newProps) {
-        if (newProps.value !== this.state.value) {
-            this.setState({
-                value: newProps.value
-            }, () => {
-                this.refInput.value = newProps.value;
-                this.refInput.focus();
-            });
+    static getDerivedStateFromProps(props) {
+        return {
+            value: props.value
         }
+
     }
 
     state = {

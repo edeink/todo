@@ -28,14 +28,6 @@ export default class Category extends PureComponent {
         }
     }
 
-    componentWillReceiveProps(newProps) {
-        if (newProps.options !== this.props.options) {
-            this.setState({
-                options: newProps.options
-            });
-        }
-    }
-
     onClick = (key) => {
         this.props.onChange(key);
     };

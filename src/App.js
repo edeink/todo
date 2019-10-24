@@ -26,11 +26,6 @@ import FilterTags from "./Component/Exclusive/FilterTags";
 
 const store = window.localStorage;
 
-const ANIMATE = {
-    INSERT_TODO: 'bounceIn',
-    INSERT_DONE: 'slideInDown',
-};
-
 // 从配置中读取信息
 const {
     CATEGORY_LIST, LIMIT_WORDS, STORE_TODO_KEY,
@@ -65,7 +60,6 @@ class App extends PureComponent {
         categoryKey: INIT_CATEGORY_KEY, // 当前激活的分类
         openTool: false, // 打开工具栏
         enableAnimate: false, // 禁用动画
-        todoEnterAnimate: '',
         theme: ColorTheme.getTheme(), // THEME.DEFAULT,
         insertValue: '',
         confirmVisible: false,
@@ -487,7 +481,7 @@ class App extends PureComponent {
     render() {
         const {
             focus, category, categoryKey, openTool,
-            enableAnimate, todoEnterAnimate, theme,
+            enableAnimate, theme,
             insertValue, confirmVisible, confirmText,
             tags, filterTag,
         } = this.state;
@@ -519,9 +513,7 @@ class App extends PureComponent {
                                 checked={false}
                                 filterTag={filterTag}
                                 placeholder={"不来一发吗?"}
-                                enterActive={todoEnterAnimate}
                                 transitionEnter={enableAnimate}
-                                transitionLeave={false}
                                 draggable={true}
                                 onSelect={this.toggleOneData}
                                 onDelete={this.deleteOneData}
@@ -538,9 +530,7 @@ class App extends PureComponent {
                                 checked small
                                 filterTag={filterTag}
                                 list={doneData}
-                                enterActive={ANIMATE.INSERT_DONE}
                                 transitionEnter={false}
-                                transitionLeave={false}
                                 onSelect={this.toggleOneData}
                                 onDelete={this.deleteOneData}
                                 onInsertTag={this.onInsertTag}/>

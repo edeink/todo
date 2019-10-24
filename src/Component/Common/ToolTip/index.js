@@ -1,7 +1,6 @@
 import React, {PureComponent} from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-// import cs from 'classnames';
 import './index.scss';
 
 let popup = null;
@@ -25,8 +24,11 @@ const getAnchor = () => {
 const DIRECTION = {
     TOP: 'top',
     Bottom: 'bottom',
-}
+};
 
+/**
+ * hover时的提示（文字或自定义组件）
+ */
 class ToolTipContent extends PureComponent {
     static propTypes = {
         x: PropTypes.number.isRequired,

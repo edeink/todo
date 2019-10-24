@@ -5,9 +5,12 @@ import './index.scss';
 
 export default class Checkbox extends PureComponent {
     static propTypes = {
+        // 是否选中
         checked: PropTypes.bool,
-        onChange: PropTypes.func,
+        // 尺寸变小
         small: PropTypes.bool,
+        // 选中状态变更
+        onChange: PropTypes.func,
     };
 
     toggleChecked = () => {

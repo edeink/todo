@@ -11,7 +11,7 @@
     border-radius: 8px;
     color: #e1e1e1;
     outline: none;
-    -webkit-app-region: drag;
+    -webkit-app-region: drag; // 该标记位代表electron是否允许拖拽
     user-select: none;
     overflow: hidden;
     box-shadow: 0 0 10px rgba(0, 0, 0, .9);

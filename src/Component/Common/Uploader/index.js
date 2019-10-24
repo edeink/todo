@@ -1,8 +1,8 @@
 import React, { PureComponent } from 'react';
 import PropTypes from 'prop-types';
-// import cs from 'classnames';
-import './index.scss';
 import fileHelper from "../../../tool/file";
+
+import './index.scss';
 
 const ACCEPT_TYPE = {
     JSON: 'json',
@@ -11,6 +11,9 @@ const ACCEPT_TYPE = {
 
 export {ACCEPT_TYPE};
 
+/**
+ * 导入组价
+ */
 export default class Uploader extends PureComponent {
     static propTypes = {
         type: PropTypes.oneOf([ACCEPT_TYPE.JSON, ACCEPT_TYPE.TEXT]),

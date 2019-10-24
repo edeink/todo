@@ -18,12 +18,12 @@ export default class Tip extends PureComponent {
         active: false,
     };
 
-    componentWillMount() {
+    componentDidMount() {
         window.addEventListener(eventHelper.TYPE.TIP, this._showTip);
     }
 
     componentWillUnmount() {
-        window.addEventListener(eventHelper.TYPE.TIP, this._showTip);
+        window.removeEventListener(eventHelper.TYPE.TIP, this._showTip);
     }
 
     static showTip = (tip, timeout) => {

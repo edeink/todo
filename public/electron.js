@@ -19,7 +19,9 @@ const MENU_TYPE = {
     CHECKBOX: 'checkbox',
     RADIO: 'radio',
 };
+
 const iconPath = path.join(__dirname, './img/icon18.png');
+const iconMacPath = path.join(__dirname, './img/icon18_mac.png');
 const iconClearPath = path.join(__dirname, './img/icon48.png');
 const aboutMsg =
 `
@@ -152,13 +154,16 @@ function createWindow() {
         trayUpdate(trayMenu);
     }
     function maxOrMin() {
+        if (!win.isVisible()) {
+            hideOrShow();
+        }
         if (!isMax) {
             if (isWin) {
                 win.setSize(winWidth, screenHeight - 100);
                 win.setPosition(parseInt(screenWidth - winWidth), 100);
             } else {
-                win.setSize(winWidth, screenHeight);
-                win.setPosition(parseInt(screenWidth - winWidth), 0);
+                win.setSize(winWidth, screenHeight - 110);
+                win.setPosition(parseInt(screenWidth - winWidth), 130);
             }
             trayMenu[1].label = '收起';
         } else {
@@ -177,12 +182,19 @@ function createWindow() {
         tray.setContextMenu(contextMenu);
     }
 
-
     // 系统托盘
-    tray = new Tray(iconPath);
+    tray = new Tray(isMac ? iconMacPath : iconPath);
     const contextMenu = Menu.buildFromTemplate(trayMenu);
     // tray.setToolTip('This is my application.');
     tray.setContextMenu(contextMenu);
+    // if (isMac) {
+    //     tray.on('click', function () {
+    //         tray.setImage(iconPath);
+    //     });
+    //     tray.on('balloon-closed', function () {
+    //         tray.setImage(iconPath);
+    //     });
+    // }
 
     // 应用菜单
     const menu = Menu.buildFromTemplate(isMac ? trayMenu : []); // 空代表不要菜单
@@ -199,6 +211,9 @@ function createWindow() {
     win.on('closed', function () {
         win = null
     });
+
+    // 暂时看看最大化效果
+    maxOrMin();
 }
 
 app.on('ready', createWindow);

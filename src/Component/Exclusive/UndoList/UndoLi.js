@@ -36,6 +36,7 @@ export default class UndoLi extends PureComponent {
         className: PropTypes.string,
         isMatch: PropTypes.bool,
         draggable: PropTypes.bool,
+        // 动作回调
         onSelect: PropTypes.func,
         onDelete: PropTypes.func,
         onActive: PropTypes.func,

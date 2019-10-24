@@ -1,7 +1,6 @@
-import React, {PureComponent} from 'react';
+import React, {Component} from 'react';
 import ReactDOM from 'react-dom';
 import PropTypes from 'prop-types';
-// import cs from 'classnames';
 import './index.scss';
 
 let popup = null;
@@ -22,13 +21,16 @@ const getAnchor = () => {
     }
 };
 
-export default class BaseModal extends PureComponent {
+/**
+ * 弹出空白的框
+ */
+export default class BaseModal extends Component {
     static propTypes = {
         show: PropTypes.bool.isRequired,
         children: PropTypes.object,
     };
 
-    componentWillUpdate(newProps) {
+    shouldComponentUpdate(newProps) {
         const {show, children} = this.props;
         if (show !== newProps.show) {
             if (newProps.show === false) {

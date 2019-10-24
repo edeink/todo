@@ -7,8 +7,11 @@ import CloseBtn from "../../CloseBtn";
 
 export default class Confirm extends PureComponent {
     static propTypes = {
+        // 显示
         show: PropTypes.bool.isRequired,
+        // 标题
         title: PropTypes.string.isRequired,
+        // 点击回调
         onOk: PropTypes.func,
         onCancel: PropTypes.func,
     };

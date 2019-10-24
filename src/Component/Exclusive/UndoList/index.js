@@ -1,7 +1,7 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
 import {Droppable} from "react-beautiful-dnd";
-import {CSSTransitionGroup} from 'react-transition-group'
+import {TransitionGroup, CSSTransition} from 'react-transition-group'
 import cs from 'classnames';
 
 import UndoLi from './UndoLi';
@@ -17,17 +17,22 @@ export default class UndoList extends Component {
     static propTypes = {
         id: PropTypes.string,
         className: PropTypes.string,
+        // 本地持久化需要的key
         storeKey: PropTypes.string.isRequired,
+        // 列表原始数据
         list: PropTypes.array,
+        // 是否勾选
         checked: PropTypes.bool,
+        // 过滤分类
         filterTag: PropTypes.array,
+        // 尺寸变小
         small: PropTypes.bool,
         placeholder: PropTypes.string,
-        enterActive: PropTypes.string,
-        leaveActive: PropTypes.string,
+        // 增加是否启用动画效果
         transitionEnter: PropTypes.bool,
-        transitionLeave: PropTypes.bool,
+        // 是否允许拖拽
         draggable: PropTypes.bool,
+        // 动作回调
         onSelect: PropTypes.func,
         onDelete: PropTypes.func,
         onInsertTag: PropTypes.func,
@@ -56,35 +61,46 @@ export default class UndoList extends Component {
     };
 
     _renderUndoLi(eachList, index, filterTag) {
-        const {small, checked, storeKey, draggable, onSelect, onDelete, onInsertTag} = this.props;
+        const {
+            small, checked, storeKey, draggable, onSelect, onDelete, onInsertTag, transitionEnter,
+        } = this.props;
         const tags = eachList[RENDER_TAGS_KEY];
         let isMatch = true;
         if (filterTag.length > 0) {
-            isMatch = filterTag.some(function(eachFilterTag) {
+            isMatch = filterTag.some(function (eachFilterTag) {
                 return tags.has(eachFilterTag);
             });
         }
         return (
-            <UndoLi
-                listData={eachList}
+            <CSSTransition
+                className="animated"
+                classNames={{
+                    enter: transitionEnter ? "bounceIn" : '',
+                }}
                 key={eachList.value}
-                index={index}
-                small={small}
-                checked={checked}
-                isMatch={isMatch}
-                storeKey={storeKey}
-                draggable={draggable}
-                onSelect={onSelect}
-                onDelete={onDelete}
-                onActive={this.onActive}
-                onInsertTag={onInsertTag}/>
+                timeout={{
+                    enter: transitionEnter ? 300 : 0,
+                    exit: 0
+                }}>
+                <UndoLi
+                    listData={eachList}
+                    index={index}
+                    small={small}
+                    checked={checked}
+                    isMatch={isMatch}
+                    storeKey={storeKey}
+                    draggable={draggable}
+                    onSelect={onSelect}
+                    onDelete={onDelete}
+                    onActive={this.onActive}
+                    onInsertTag={onInsertTag}/>
+            </CSSTransition>
         )
     }
 
     render() {
         let {
             id, placeholder, className, list,
-            enterActive, leaveActive, transitionEnter, transitionLeave,
             filterTag,
         } = this.props;
 
@@ -100,23 +116,14 @@ export default class UndoList extends Component {
                                 <div key="place-older"
                                      className="list-holder">{placeholder}</div>
                             }
-                            <CSSTransitionGroup
-                                transitionName={{
-                                    enter: "animated",
-                                    enterActive: enterActive || "bounceIn",
-                                    leave: "animated",
-                                    leaveActive: leaveActive || "fadeOutRight"
-                                }}
-                                transitionEnter={transitionEnter && true}
-                                transitionLeave={transitionLeave && true}
-                                transitionEnterTimeout={300}
-                                transitionLeaveTimeout={200}>
+                            <TransitionGroup>
                                 {
                                     list.map((eachList, index) => {
                                         return this._renderUndoLi(eachList, index, filterTag);
                                     })
                                 }
-                            </CSSTransitionGroup>
+                            </TransitionGroup>
+
                             {provided.placeholder}
                         </ul>
                     )
