@@ -58,12 +58,15 @@ export default class BaseModal extends Component {
                 props.show = null;
 
                 ReactDOM.render(
-                    <React.Fragment>
-                        <div className="mask"/>
-                        <div className="container animated bounceIn">
-                            {children}
-                        </div>
-                    </React.Fragment>, popup
+                    React.cloneElement(
+                        <React.Fragment>
+                            <div className="mask"/>
+                            <div className="container animated bounceIn">
+                                {children}
+                            </div>
+                        </React.Fragment>
+                    , props)
+                   , popup
                 );
             }
             return true;

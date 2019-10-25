@@ -72,7 +72,7 @@ $normal-color: #AEB5C0;
     }
 
     // 预览
-    .input-li.undo-li {
+    .input-li.li {
         color: rgba(0, 0, 0, .2);
     }
 
@@ -178,6 +178,18 @@ $normal-color: #AEB5C0;
 
         &:hover {
             background: rgba(0, 0, 0, .05);
+        }
+    }
+
+    .calendar {
+        background: rgba(255, 255, 255, .8);
+        .day {
+            &.now {
+                background: rgba(0, 0, 0, .1);
+            }
+            &:hover {
+                background: rgba(0, 0, 0, .15);
+            }
         }
     }
 }

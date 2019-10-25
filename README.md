@@ -22,14 +22,14 @@ yarn # install deps 安装依赖
 
 # 调试
 yarn start # web页面调试
-electron . # electron页面调试
+yarn start-app # electron页面调试
 
 # 构建
 yarn clear # 清除旧代码
-yarn build # 生成chrome插件
-yarn dist # 生成electron应用
+yarn build-web # 生成chrome插件
+yarn build-app # 生成electron应用
 # ===
-yarn build-app # yarn clear & yarn build & yarn dist
+yarn dist-app # yarn clear & yarn build-web & yarn build-app
 
 # 发布页面
 yarn deploy # 发布github pages
@@ -70,6 +70,12 @@ yarn deploy # 发布github pages
 
 ```bash
 export ELECTRON_MIRROR="https://npm.taobao.org/mirrors/electron/"
+```
+
+由于未知的BUG，7.x版本的Electron暂时需要全局安装
+
+```bash
+yarn add electron --global
 ```
 
 - 更新所有旧的依赖项

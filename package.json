@@ -25,10 +25,11 @@
   },
   "scripts": {
     "start": "react-scripts start",
+    "start-app": "cross-env NODE_ENV=development electron . ",
     "clear": "cross-env rm -rf build && rm -rf dist ",
-    "build": "cross-env INLINE_RUNTIME_CHUNK=false react-scripts build",
-    "dist": "electron-builder",
-    "build-app": "yarn clear && yarn build && yarn dist",
+    "build-web": "cross-env INLINE_RUNTIME_CHUNK=false react-scripts build",
+    "build-app": "electron-builder",
+    "dist-app": "yarn clear && yarn build && yarn dist",
     "deploy": "gh-pages -d build",
     "pack": "electron-builder --dir",
     "postinstall": "electron-builder install-app-deps"
@@ -63,7 +64,6 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "electron": "^7.0.0",
     "electron-builder": "^21.2.0"
   }
 }

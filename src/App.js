@@ -218,6 +218,29 @@ class App extends PureComponent {
         }
     };
 
+    // 拖拽数据
+    dragData = (listData, storeKey) => {
+        const {activeCategoryKey} = this.state;
+        this.setState({
+            [storeKey]: [...listData]
+        });
+        const realStoreKey = getRealStoreKey(activeCategoryKey, storeKey);
+        store.setItem(realStoreKey, stringify(listData));
+    };
+
+    // 更改一条数据
+    changeOneData = (index, data, storeKey) => {
+        const {activeCategoryKey} = this.state;
+        const todoData = this.state[STORE_TODO_KEY];
+        let listData = [...todoData];
+        listData[index] = data;
+        this.setState({
+            [storeKey]: listData
+        });
+        const realStoreKey = getRealStoreKey(activeCategoryKey, storeKey);
+        store.setItem(realStoreKey, stringify(listData));
+    };
+
     // 删除列表
     deleteOneData = (index, storeKey, enableAnimate, showConfirm) => {
         // 是否弹出删除按钮
@@ -237,7 +260,6 @@ class App extends PureComponent {
                     confirmVisible: false,
                     confirmText: '',
                 });
-                this.preDeleteTime = Date.now();
             };
             this.setState({
                 confirmVisible: true,
@@ -300,16 +322,6 @@ class App extends PureComponent {
             });
         }
     }
-
-    // 拖拽数据
-    dragData = (listData, storeKey) => {
-        const {activeCategoryKey} = this.state;
-        this.setState({
-            [storeKey]: [...listData]
-        });
-        const realStoreKey = getRealStoreKey(activeCategoryKey, storeKey);
-        store.setItem(realStoreKey, stringify(listData));
-    };
 
     // 插入新的Tag
     onInsertTag = (tag) => {
@@ -557,7 +569,8 @@ class App extends PureComponent {
                                             onSelect={this.toggleOneData}
                                             onDelete={this.deleteOneData}
                                             onActive={this.handleActive}
-                                            onInsertTag={this.onInsertTag}/>
+                                            onInsertTag={this.onInsertTag}
+                                            onChangeData={this.changeOneData}/>
                                         {
                                             doneData.length > 0 &&
                                             <div className="done-split"/>
@@ -612,6 +625,7 @@ class App extends PureComponent {
                         </ToolTip>
                         <ColorTheme onChange={this.handleThemeChange}/>
                     </Tool>
+                    {/*<Calendar/>*/}
                 </div>
             </DragDropContext>
         );

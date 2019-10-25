@@ -5,7 +5,7 @@ import cs from 'classnames';
 
 import CloseBtn from '../../Common/CloseBtn/index';
 import Tip from '../Tip/index';
-import UndoLi from "../UndoList/UndoLi";
+import RenderLine from "../../RenderLine";
 
 import parser from "../../../tool/parser";
 import TODO_CONFIG from "../../../config/index";
@@ -98,7 +98,7 @@ export default class Input extends PureComponent {
                         <React.Fragment>
                             {
                                 (parseData && parseData.length >= 2) &&
-                                <UndoLi className={cs("input-li", {'focus': focus})} listData={renderData}/>
+                                <RenderLine className={cs("input-li", {'focus': focus})} listData={renderData}/>
                             }
                             <div ref={provided.innerRef}
                                  className={cs("input-wrapper", className,

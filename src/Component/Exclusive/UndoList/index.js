@@ -1,10 +1,10 @@
 import React, {Component} from 'react';
 import PropTypes from 'prop-types';
-import {Droppable} from "react-beautiful-dnd";
-import {TransitionGroup, CSSTransition} from 'react-transition-group'
 import cs from 'classnames';
 
-import UndoLi from './UndoLi';
+import {Droppable} from "react-beautiful-dnd";
+import {TransitionGroup, CSSTransition} from 'react-transition-group'
+import RenderLine from '../../RenderLine';
 
 import {stringify} from "../../../tool/json";
 import TODO_CONFIG from '../../../config';
@@ -36,7 +36,7 @@ export default class UndoList extends Component {
         onSelect: PropTypes.func,
         onDelete: PropTypes.func,
         onInsertTag: PropTypes.func,
-
+        onChangeData: PropTypes.func,
     };
 
     shouldComponentUpdate(nextProps) {
@@ -44,11 +44,13 @@ export default class UndoList extends Component {
         if (list.length !== nextProps.list.length) {
             return true;
         }
+
         let preList = stringify(list);
         let newList = stringify(nextProps.list);
         if (preList !== newList) {
             return true;
         }
+
         if (filterTag !== nextProps.filterTag) {
             return true;
         }
@@ -59,6 +61,11 @@ export default class UndoList extends Component {
         const {storeKey, onActive} = this.props;
         onActive(index, storeKey);
     };
+
+    handleChangeData = (index, data) => {
+        const {onChangeData, storeKey} = this.props;
+        onChangeData(index, data, storeKey);
+    }
 
     _renderUndoLi(eachList, index, filterTag) {
         const {
@@ -82,7 +89,7 @@ export default class UndoList extends Component {
                     enter: transitionEnter ? 300 : 0,
                     exit: 0
                 }}>
-                <UndoLi
+                <RenderLine
                     listData={eachList}
                     index={index}
                     small={small}
@@ -93,7 +100,8 @@ export default class UndoList extends Component {
                     onSelect={onSelect}
                     onDelete={onDelete}
                     onActive={this.onActive}
-                    onInsertTag={onInsertTag}/>
+                    onInsertTag={onInsertTag}
+                    onChangeData={this.handleChangeData}/>
             </CSSTransition>
         )
     }
