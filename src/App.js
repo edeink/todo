@@ -18,15 +18,18 @@ class App extends PureComponent {
         openTool: false, // 打开工具栏
         theme: ColorTheme.getTheme(), // THEME.DEFAULT,
         confirmVisible: false,
+        confirmCallback: null,
         confirmText: '',
     };
 
     componentDidMount() {
         window.addEventListener(eventHelper.TYPE.CHANGE_THEME, this.handleThemeChange);
+        window.addEventListener(eventHelper.TYPE.CONFIRM, this.showConfirm);
     }
 
     componentWillUnmount() {
         window.removeEventListener(eventHelper.TYPE.CHANGE_THEME, this.handleThemeChange);
+        window.addEventListener(eventHelper.TYPE.CONFIRM, this.showConfirm);
     }
 
     onDragEnd(result) {
@@ -44,6 +47,31 @@ class App extends PureComponent {
         const {theme} = event.detail;
         this.setState({
             theme
+        });
+    };
+
+    showConfirm = (event) => {
+        const {text: confirmText, ensure: confirmCallback} = event.detail;
+        this.setState({
+            confirmText,
+            confirmCallback,
+            confirmVisible: true,
+        })
+    };
+
+    onConfirm = () => {
+        const {confirmCallback} = this.state;
+        const result = confirmCallback && confirmCallback();
+        if (result !== false) {
+            this.onConfirmCancel();
+        }
+    };
+
+    // 取消
+    onConfirmCancel = () => {
+        this.setState({
+            confirmVisible: false,
+            confirmText: '',
         });
     };
 

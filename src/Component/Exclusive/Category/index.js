@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import cs from 'classnames';
 import './index.scss';
 import ToolTip from "../../Common/ToolTip";
-import Confirm from "../../Common/Modal/Confirm";
 import TODO_CONFIG from '../../../config';
 import KEYCODE from "../../../tool/keycode";
 import eventHelper from "../../../tool/event";
@@ -52,8 +51,9 @@ export default class Category extends PureComponent {
         if (activeIndex !== -1) {
             options.splice(activeIndex, 1);
             activeIndex = activeIndex - 1 >=0 ? activeIndex - 1 : 0;
+            store.setItem(STORE_ACTIVE_CATEGORY_KEY, options[activeIndex].key);
             store.setItem(STORE_CATEGORY_KEY, JSON.stringify(options));
-            onDelete && onDelete(options[activeIndex].key, options)
+            onDelete();
         }
     };
 
@@ -191,35 +191,19 @@ export default class Category extends PureComponent {
  * 删除空页签按钮
  */
 export class DeleteEmptyCategory extends PureComponent {
-    state = {
-        confirmDelete: false,
-    };
-
     showConfirm = () => {
-        this.setState({confirmDelete: true});
-    };
-
-    onConfirm = () => {
-        this.setState({confirmDelete: false}, function () {
-            eventHelper.dispatch(eventHelper.TYPE.DELETE_CATEGORY)
+        eventHelper.dispatch(eventHelper.TYPE.CONFIRM, {
+            text: '将清空当前页签下的列表',
+            ensure: () => {
+                eventHelper.dispatch(eventHelper.TYPE.DELETE_CATEGORY)
+            }
         });
     };
 
-    onConfirmCancel = () => {
-        this.setState({confirmDelete: false});
-    };
-
     render() {
-
-        const {confirmDelete} = this.state;
         return (
             <React.Fragment>
                 <div className="category-delete" onClick={this.showConfirm}>点击删除空页签</div>
-                {/*确认信息*/}
-                <Confirm show={confirmDelete}
-                         title="将清空当前页签下的列表"
-                         onOk={this.onConfirm}
-                         onCancel={this.onConfirmCancel}/>
             </React.Fragment>
         )
     }

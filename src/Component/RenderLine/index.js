@@ -128,7 +128,7 @@ export default class RenderLine extends PureComponent {
                         {
                             onDelete &&
                             <CloseBtn onClick={(event) => {
-                                onDelete(index, storeKey, event, true)
+                                onDelete(index, storeKey)
                             }}/>
                         }
 

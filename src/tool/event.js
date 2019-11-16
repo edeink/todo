@@ -6,6 +6,7 @@ const eventHelper = {
         READ_DATA: 'READ_DATA', // 读取数据
         CHANGE_THEME: 'CHANGE_THEME', // 更改样式
         DRAG_END: 'DRAG_END', // 拖拽结束
+        CONFIRM: 'CONFIRM', // 弹出确认框
     },
     stop(event) {
         event.stopPropagation();
