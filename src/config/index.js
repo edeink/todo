@@ -1,8 +1,10 @@
+const DEFAULT_CATEGORY_KEY = 'default';
 const TODO_CONFIG = {
     LIMIT_WORDS: 100, // 允许输入的字
+    DEFAULT_CATEGORY_KEY,
     // 默认分类
     CATEGORY_LIST: [
-        {key: 'default', value: '默认'},
+        {key: DEFAULT_CATEGORY_KEY, value: '默认'},
         // {key: 'work', value: '工作'},
         // {key: 'home', value: '家庭'},
         // {key: 'study', value: '学习'},

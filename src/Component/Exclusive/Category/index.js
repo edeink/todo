@@ -6,10 +6,11 @@ import ToolTip from "../../Common/ToolTip";
 import Confirm from "../../Common/Modal/Confirm";
 import TODO_CONFIG from '../../../config';
 import KEYCODE from "../../../tool/keycode";
+import eventHelper from "../../../tool/event";
 
 const store = window.localStorage;
 
-const {STORE_CATEGORY_KEY} = TODO_CONFIG;
+const {STORE_CATEGORY_KEY, STORE_ACTIVE_CATEGORY_KEY} = TODO_CONFIG;
 
 export default class Category extends PureComponent {
     static propTypes = {
@@ -29,8 +30,35 @@ export default class Category extends PureComponent {
         }
     }
 
+    componentDidMount() {
+        window.addEventListener(eventHelper.TYPE.DELETE_CATEGORY, this.onDelete)
+    }
+
+    componentWillUnmount() {
+        window.removeEventListener(eventHelper.TYPE.DELETE_CATEGORY, this.onDelete);
+    }
+
+    // 删除并存储
+    onDelete = () => {
+        const {activeKey, options, onDelete} = this.props;
+        let activeIndex = -1;
+        options.some(function (eachOption, index) {
+           if (eachOption.key === activeKey) {
+               activeIndex = index
+               return true;
+           }
+           return false;
+        });
+        if (activeIndex !== -1) {
+            options.splice(activeIndex, 1);
+            activeIndex = activeIndex - 1 >=0 ? activeIndex - 1 : 0;
+            store.setItem(STORE_CATEGORY_KEY, JSON.stringify(options));
+            onDelete && onDelete(options[activeIndex].key, options)
+        }
+    };
+
     onClick = (key) => {
-        this.props.onActive(key);
+        this.onActive(key);
     };
 
     onKeyDown = (event) => {
@@ -48,8 +76,13 @@ export default class Category extends PureComponent {
         })
     };
 
+    onActive = (key) => {
+        store.setItem(STORE_ACTIVE_CATEGORY_KEY, key);
+        this.props.onActive(key);
+    };
+
     onBlur = (key) => {
-        const {options, onDelete} = this.props;
+        const {activeKey, options, onDelete} = this.props;
         const {focusIndex, focusKey, focusValue} = this.state;
         if (key === focusKey) {
             this.setState({
@@ -63,7 +96,7 @@ export default class Category extends PureComponent {
         let modifyCategory = options[focusIndex];
         if (!focusValue) {
             if (modifyCategory && modifyCategory.isNew === true) {
-                onDelete(focusIndex);
+                onDelete(activeKey, options);
             }
             return false;
         }
@@ -79,7 +112,7 @@ export default class Category extends PureComponent {
         }
         options[focusIndex] = modifyCategory;
         store.setItem(STORE_CATEGORY_KEY, JSON.stringify(options));
-        this.props.onActive(modifyCategory.key);
+        this.onActive(modifyCategory.key);
     };
 
     onValueChange = (event) => {
@@ -134,7 +167,6 @@ export default class Category extends PureComponent {
 
     render() {
         const {options} = this.props;
-        console.log(options);
         return (
             <div className="todo-category">
                 <ul>
@@ -159,10 +191,6 @@ export default class Category extends PureComponent {
  * 删除空页签按钮
  */
 export class DeleteEmptyCategory extends PureComponent {
-    static propTypes = {
-        onClick: PropTypes.func.isRequired,
-    };
-
     state = {
         confirmDelete: false,
     };
@@ -172,9 +200,9 @@ export class DeleteEmptyCategory extends PureComponent {
     };
 
     onConfirm = () => {
-        const {onClick} = this.props;
-        this.setState({confirmDelete: false});
-        onClick();
+        this.setState({confirmDelete: false}, function () {
+            eventHelper.dispatch(eventHelper.TYPE.DELETE_CATEGORY)
+        });
     };
 
     onConfirmCancel = () => {

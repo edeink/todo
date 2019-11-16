@@ -7,7 +7,7 @@ import CloseBtn from '../../Common/CloseBtn/index';
 import Tip from '../Tip/index';
 import RenderLine from "../../RenderLine";
 
-import parser from "../../../tool/parser";
+import parser from "../../../data/_deprecated/parser";
 import TODO_CONFIG from "../../../config/index";
 import KEYCODE from '../../../tool/keycode';
 
@@ -42,12 +42,18 @@ export default class Input extends PureComponent {
         return {
             value: props.value
         }
-
     }
 
     state = {
         value: '',
     };
+
+    componentDidUpdate(prevProps, prevState, snapshot) {
+        const {value} = this.props;
+        if (value !== this.refInput.value) {
+            this.refInput.value = value;
+        }
+    }
 
     handleKeydown = (event) => {
         const {onEnter} = this.props;

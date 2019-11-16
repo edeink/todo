@@ -1,4 +1,4 @@
-import TODO_CONFIG from '../config';
+import TODO_CONFIG from '../../config';
 import PARSER_TEST from './parser_test';
 
 const {RENDER_STRING_KEY, RENDER_TAGS_KEY, RENDER_TIME_KEY} = TODO_CONFIG;

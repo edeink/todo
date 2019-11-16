@@ -7,13 +7,13 @@ import CloseBtn from "../Common/CloseBtn";
 import Time from "./Time";
 import Tags from "./Tags";
 import HyperLink from "./HyperLink";
-import Emphasize from "./Emphasize";
-import Code from "./Code";
-import Delete from "./Delete";
+import Emphasize from "./_deprecated/Emphasize";
+import Code from "./_deprecated/Code";
+import Delete from "./_deprecated/Delete";
 import Text from "./Text";
 
 import TODO_CONFIG from "../../config";
-import {TOKEN_TYPE} from "../../tool/parser";
+import {TOKEN_TYPE} from "../../data/_deprecated/parser";
 
 import './index.scss';
 

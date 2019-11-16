@@ -17,19 +17,16 @@
     "node-sass": "^4.11.0",
     "prop-types": "^15.7.2",
     "react": "^16.8.6",
-    "react-beautiful-dnd": "^11.0.2",
+    "react-beautiful-dnd": "^12.0.0",
     "react-dom": "^16.8.6",
     "react-scripts": "^3.2.0",
     "react-transition-group": "^4.3.0",
-    "typescript": "^3.4.3"
+    "typescript": "^3.7.2"
   },
   "scripts": {
     "start": "react-scripts start",
-    "start-app": "cross-env NODE_ENV=development electron . ",
     "clear": "cross-env rm -rf build && rm -rf dist ",
     "build-web": "cross-env INLINE_RUNTIME_CHUNK=false react-scripts build",
-    "build-app": "electron-builder",
-    "dist-app": "yarn clear && yarn build && yarn dist",
     "deploy": "gh-pages -d build",
     "pack": "electron-builder --dir",
     "postinstall": "electron-builder install-app-deps"
@@ -64,6 +61,7 @@
     "not op_mini all"
   ],
   "devDependencies": {
-    "electron-builder": "^21.2.0"
+    "electron": "^7.1.1",
+    "electron-builder": "^22.1.0"
   }
 }

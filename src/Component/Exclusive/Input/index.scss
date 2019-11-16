@@ -30,19 +30,12 @@
 
     .close-btn {
         right: 14px;
-        opacity: 0;
     }
 
-    &.focus {
-        input {
-            opacity: .9;
-            box-shadow: 0 -1px 8px 2px rgba(0, 0, 0, .2);
-            background: rgba(0, 0, 0, .2);
-        }
-
-        .close-btn {
-            opacity: 1;
-        }
+    input:focus {
+        opacity: .9;
+        box-shadow: 0 -1px 8px 2px rgba(0, 0, 0, .2);
+        background: rgba(0, 0, 0, .2);
     }
 
     &.empty {

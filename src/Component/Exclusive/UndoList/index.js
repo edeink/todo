@@ -6,7 +6,7 @@ import {Droppable} from "react-beautiful-dnd";
 import {TransitionGroup, CSSTransition} from 'react-transition-group'
 import RenderLine from '../../RenderLine';
 
-import {stringify} from "../../../tool/json";
+import {stringify} from "../../../data/store/json";
 import TODO_CONFIG from '../../../config';
 
 import './index.scss';

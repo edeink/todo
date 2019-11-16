@@ -45,6 +45,9 @@
     }
 
     &.is-active {
+        .icon-setting {
+            display: none;
+        }
         &:before {
             width: 800px;
             height: 800px;

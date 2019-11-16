@@ -13,6 +13,12 @@
 - [百度网盘](https://pan.baidu.com/s/1_ATx2kpTuqLoDP9BSHNNrg)：提取码: `i43x`
   - 若链接失效，请通知作者
 
+
+
+————————————————————————开发相关——————————————————————
+
+
+
 ## 调试 或 构建
 
 ```shell
@@ -22,14 +28,12 @@ yarn # install deps 安装依赖
 
 # 调试
 yarn start # web页面调试
-yarn start-app # electron页面调试
+NODE_ENV=development electron .  # electron页面调试
 
 # 构建
 yarn clear # 清除旧代码
 yarn build-web # 生成chrome插件
-yarn build-app # 生成electron应用
-# ===
-yarn dist-app # yarn clear & yarn build-web & yarn build-app
+electron-builder # 生成electron应用
 
 # 发布页面
 yarn deploy # 发布github pages
@@ -50,19 +54,22 @@ yarn deploy # 发布github pages
   - [x] 持久化、导入导出
   - [ ] 后端同步
 - [ ] 系统
-  - [x] chrome插件、系统提醒、系统托盘、图标
+  - [x] chrome插件
+  - [ ] 系统提醒
+  - [x] 系统托盘
+  - [ ] 图标
 - [x] 显示
-  - [x] 主题色：**黑色** | **白色** 主题
-  - [x] 自定义语法
-    - 时间：` >${number}${unit} ${hour}:${minute}:${seconds}`。eg：`>1h`（一个小时后）、`> 18:00`（当地时间18：00）、`>1d 8:20`（明天早上八点20分）
-        - 标签：`[A, B]`或`[A][B]`
-      - [x] 行级Markdown语法
-    - 超链接：`[baidu](https://www.baidu.com)`、强调：`*xxx*`、`**xxx**`、`***xxx***`、修饰：\``code`\`、`~~delete~~`
+  - [x] 主题色：
+    - 黑色
+    - 白色
+  - [x] 简单的语法
+    - 标签：`[A][B]`
+    - 超链接：`[baidu](https://www.baidu.com)`
   - [ ] 行级富文本编辑器
 - [ ] 发布
-    - [ ] 自动更新
-    - [ ] 持续集成
-    - [ ] Github Release
+  - [ ] 自动更新
+  - [ ] 持续集成
+  - [ ] Github Release
 
 ## 其他
 
@@ -84,3 +91,11 @@ yarn add electron --global
 yarn upgrade-interactive [--latest]
 ```
 
+
+
+
+
+重构：
+
+- 分离数据和视图
+- 拆分组件（合并Undo和Todo、解耦）

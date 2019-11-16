@@ -1,5 +1,5 @@
 // import fastJson from 'fast-json-stringify';
-import TODO_CONFIG from '../config';
+import TODO_CONFIG from '../../config';
 
 const {RENDER_ACTIVE_KEY, RENDER_STRING_KEY, RENDER_TIME_KEY} = TODO_CONFIG;
 
